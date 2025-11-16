@@ -1,10 +1,31 @@
+
+'use client';
+
+import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { BellRing } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [earthquakeNotif, setEarthquakeNotif] = useState(false);
+  const [weatherAlertNotif, setWeatherAlertNotif] = useState(true);
+
+  const handleSaveChanges = () => {
+    // In a real app, you would save these settings to a backend or localStorage.
+    console.log({
+      earthquakeNotif,
+      weatherAlertNotif
+    });
+    toast({
+      title: "Pengaturan Disimpan",
+      description: "Preferensi notifikasi Anda telah diperbarui.",
+    });
+  };
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="space-y-1">
@@ -27,7 +48,12 @@ export default function SettingsPage() {
                         </p>
                     </div>
                 </div>
-                <Switch id="earthquake-notif" aria-label="Notifikasi Gempa Bumi" />
+                <Switch 
+                  id="earthquake-notif" 
+                  aria-label="Notifikasi Gempa Bumi"
+                  checked={earthquakeNotif}
+                  onCheckedChange={setEarthquakeNotif}
+                />
             </div>
              <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="flex items-start gap-4">
@@ -39,12 +65,17 @@ export default function SettingsPage() {
                         </p>
                     </div>
                 </div>
-                <Switch id="weather-alert-notif" aria-label="Notifikasi Peringatan Cuaca"/>
+                <Switch 
+                  id="weather-alert-notif" 
+                  aria-label="Notifikasi Peringatan Cuaca"
+                  checked={weatherAlertNotif}
+                  onCheckedChange={setWeatherAlertNotif}
+                />
             </div>
         </CardContent>
       </Card>
       <div className="flex justify-start">
-        <Button>Simpan Perubahan</Button>
+        <Button onClick={handleSaveChanges}>Simpan Perubahan</Button>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import {
   signInAnonymously,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 
 /** Initiate anonymous sign-in (non-blocking). */
@@ -32,3 +34,15 @@ export function initiateEmailSignIn(authInstance: Auth, email: string, password:
       .catch((error) => reject(error));
   });
 }
+
+/** Initiate Google sign-in (non-blocking). */
+export function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(authInstance, provider)
+      .then(() => resolve())
+      .catch((error) => reject(error));
+  });
+}
+
+    

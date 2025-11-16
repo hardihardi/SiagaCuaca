@@ -8,9 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth, useUser, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn } from '@/firebase';
+import { useAuth, useUser, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, initiateGoogleSignIn } from '@/firebase';
 import { FirebaseError } from 'firebase/app';
 import { Cloud } from 'lucide-react';
+
+const GoogleIcon = () => (
+    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2">
+        <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.36 1.67-4.06 1.67-3.4 0-6.17-2.83-6.17-6.23s2.77-6.23 6.17-6.23c1.87 0 3.13.67 4.02 1.52l2.6-2.6C16.83 2.05 14.83 1 12.48 1 7.02 1 3 5.02 3 10.5s4.02 9.5 9.48 9.5c2.7 0 4.9-1 6.53-2.63 1.84-1.84 2.48-4.48 2.48-7.13 0-.66-.05-1.32-.15-1.98H12.48z" fill="#4285F4" />
+    </svg>
+);
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -52,6 +58,10 @@ export default function LoginPage() {
         case 'auth/invalid-email':
             title = "Email Tidak Valid";
             description = "Format email yang Anda masukkan tidak valid.";
+            break;
+        case 'auth/popup-closed-by-user':
+            title = "Login Dibatalkan";
+            description = "Anda menutup jendela login sebelum proses selesai.";
             break;
         default:
           description = error.message;
@@ -95,6 +105,17 @@ export default function LoginPage() {
       handleAuthError(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      await initiateGoogleSignIn(auth);
+    } catch (error) {
+        handleAuthError(error)
+    } finally {
+        setLoading(false);
     }
   };
   
@@ -143,9 +164,21 @@ export default function LoginPage() {
                 <Button onClick={handleSignIn} disabled={loading || !email || !password} className="w-full">
                   {loading ? 'Memproses...' : 'Login'}
                 </Button>
-                 <p className="text-xs text-muted-foreground">Atau lanjutkan sebagai tamu</p>
-                 <Button onClick={handleAnonymousSignIn} variant="outline" disabled={loading} className="w-full">
-                  {loading ? 'Memproses...' : 'Login Anonim'}
+                <div className="relative w-full">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">
+                            Atau lanjutkan dengan
+                        </span>
+                    </div>
+                </div>
+                 <Button onClick={handleGoogleSignIn} variant="outline" disabled={loading} className="w-full">
+                  {loading ? 'Memproses...' : <><GoogleIcon /> Masuk dengan Google</>}
+                </Button>
+                 <Button onClick={handleAnonymousSignIn} variant="secondary" disabled={loading} className="w-full">
+                  {loading ? 'Memproses...' : 'Lanjutkan sebagai Tamu'}
                 </Button>
               </CardFooter>
             </Card>
@@ -166,9 +199,22 @@ export default function LoginPage() {
                   <Input id="register-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex-col gap-4">
                 <Button onClick={handleSignUp} disabled={loading || !email || !password} className="w-full">
                   {loading ? 'Memproses...' : 'Daftar'}
+                </Button>
+                <div className="relative w-full">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">
+                            Atau daftar dengan
+                        </span>
+                    </div>
+                </div>
+                <Button onClick={handleGoogleSignIn} variant="outline" disabled={loading} className="w-full">
+                  {loading ? 'Memproses...' : <><GoogleIcon /> Daftar dengan Google</>}
                 </Button>
               </CardFooter>
             </Card>
@@ -178,3 +224,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

@@ -22,7 +22,7 @@ function formatDate(dateString: string) {
     }
 }
 
-async function SummarySection({ articleContent }: { articleContent: string }) {
+async function SummarySection({ articleId, articleContent }: { articleId: string, articleContent: string }) {
     if (!articleContent) {
         return (
              <Card>
@@ -37,7 +37,7 @@ async function SummarySection({ articleContent }: { articleContent: string }) {
             </Card>
         );
     }
-    const summary = await summarizeArticle({ articleContent });
+    const summary = await summarizeArticle({ articleId, articleContent });
     return (
         <Card>
             <CardHeader>
@@ -117,7 +117,7 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
             </div>
 
             <Suspense fallback={<SummarySkeleton />}>
-                <SummarySection articleContent={articleContent} />
+                <SummarySection articleId={article.id} articleContent={articleContent} />
             </Suspense>
 
             {article.content && (
@@ -147,3 +147,5 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
     </div>
   );
 }
+
+    

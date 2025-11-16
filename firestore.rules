@@ -12,6 +12,7 @@
  * - /weather_forecasts/{weatherForecastId}: Stores weather forecast data. Publicly readable.
  * - /earthquakes/{earthquakeId}: Stores earthquake data. Publicly readable.
  * - /weather_alerts/{weatherAlertId}: Stores weather alert data. Publicly readable.
+ * - /article_summaries/{articleId}: Stores cached AI-generated article summaries. Publicly readable.
  * - /users/{userId}/user_notifications/{userNotificationId}: Stores user notification settings.
  *   Only the user can manage their own notification settings.
  *
@@ -19,8 +20,8 @@
  * - Users can only access their own data under /users/{userId}.
  * - Users can only manage their own notification settings under /users/{userId}/user_notifications/{userNotificationId}.
  * - Listing of users is disallowed.
- * - Locations, WeatherForecasts, Earthquakes, and WeatherAlerts are publicly readable.
- * - Write access to Locations, WeatherForecasts, Earthquakes, and WeatherAlerts is not defined in this prototype.
+ * - Locations, WeatherForecasts, Earthquakes, WeatherAlerts, and ArticleSummaries are publicly readable.
+ * - Write access to Locations, WeatherForecasts, Earthquakes, WeatherAlerts, and ArticleSummaries is not defined in this prototype.
  *
  * Denormalization for Authorization:
  * - The 'userId' is used in the path for /users/{userId} and /users/{userId}/user_notifications/{userNotificationId},
@@ -154,6 +155,21 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if false;
     }
+    
+    /**
+     * @description Manages access to cached article summaries. Publicly readable, write access restricted.
+     * @path /article_summaries/{articleId}
+     * @allow (get, list) Any user or service can read cached summaries.
+     * @allow (create) Only authenticated users can trigger the creation of a summary (via the AI flow).
+     * @deny (update, delete) Summaries are immutable once created to maintain integrity.
+     * @principle Publicly readable for performance, write access is controlled.
+     */
+    match /article_summaries/{articleId} {
+      allow get, list: if true;
+      allow create: if request.auth != null; // Allow creation if user is authenticated
+      allow update, delete: if false;
+    }
+
 
     /**
      * @description Manages access to user notification settings.

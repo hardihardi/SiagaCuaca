@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -8,9 +9,36 @@ import Link from 'next/link';
 import { ChevronRight, Calendar, Tag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+function formatDate(dateString: string) {
+    if (!dateString) return "Tanggal tidak diketahui";
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("id-ID", {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
 export default function NewsSummary({ initialData }: { initialData: NewsArticle[] }) {
-    if (!initialData || !Array.isArray(initialData)) {
-        return null; 
+    if (!initialData || !Array.isArray(initialData) || initialData.length === 0) {
+        return (
+             <Card className="flex flex-col">
+                <CardHeader>
+                    <CardTitle>Berita & Artikel Terbaru</CardTitle>
+                    <CardDescription>Informasi dan edukasi seputar cuaca, iklim, dan kebencanaan.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 flex items-center justify-center">
+                    <p className="text-muted-foreground">Gagal memuat berita atau tidak ada berita tersedia.</p>
+                </CardContent>
+                <CardFooter>
+                    <Button asChild variant="secondary">
+                        <Link href="/news">Lihat Semua Berita <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                    </Button>
+                </CardFooter>
+            </Card>
+        );
     }
     const featuredArticles = initialData.slice(0, 2);
 
@@ -48,7 +76,7 @@ export default function NewsSummary({ initialData }: { initialData: NewsArticle[
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <Calendar className="h-3.5 w-3.5" />
-                                            <span>{article.date}</span>
+                                            <span>{formatDate(article.date)}</span>
                                         </div>
                                     </div>
                                 </div>

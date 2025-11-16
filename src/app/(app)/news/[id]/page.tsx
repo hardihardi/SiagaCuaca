@@ -8,6 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+function formatDate(dateString: string) {
+    if (!dateString) return "Tanggal tidak diketahui";
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("id-ID", {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) + " WIB";
+    } catch (e) {
+        return dateString;
+    }
+}
+
 export default async function NewsDetailPage({ params }: { params: { id: string } }) {
   const article = await getNewsArticleById(params.id);
 
@@ -35,7 +47,7 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Calendar className="h-4 w-4" />
-                        <span>{article.date}</span>
+                        <span>{formatDate(article.date)}</span>
                     </div>
                 </div>
                 <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
@@ -59,11 +71,22 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Cuplikan Berita</CardTitle>
+                    <CardTitle>Ringkasan</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground whitespace-pre-line">
-                        {article.description || "Cuplikan tidak tersedia."}
+                        {article.description || "Deskripsi tidak tersedia."}
+                    </p>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Konten Berita</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-line">
+                        {article.content || "Konten lengkap tidak tersedia."}
                     </p>
                 </CardContent>
             </Card>

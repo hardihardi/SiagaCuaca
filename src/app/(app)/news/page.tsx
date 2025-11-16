@@ -8,14 +8,26 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Tag } from "lucide-react";
 
-export default async function NewsPage({ searchParams }: { searchParams: { page?: string, prevPage?:string } }) {
+function formatDate(dateString: string) {
+    if (!dateString) return "Tanggal tidak diketahui";
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("id-ID", {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+export default async function NewsPage({ searchParams }: { searchParams: { page?: string, prevPage?: string } }) {
   const page = searchParams.page;
-  const prevPage = searchParams.prevPage;
+  const prevPage = searchParams.prevPage; // This might be needed for state tracking if API doesn't give prev link
   const { results: newsData, nextPage, totalResults } = await getNewsData(page);
 
-  // Simple page number calculation (assuming 10 results per page)
-  const currentPageNum = prevPage ? parseInt(prevPage.split('_')[0]) + 1 : 1;
+  const currentPageNum = page ? parseInt(page) : 1;
   const totalPages = Math.ceil((totalResults || 10) / 10);
+  const prevPageNum = currentPageNum > 1 ? (currentPageNum - 1).toString() : undefined;
 
   return (
     <div className="space-y-6">
@@ -53,7 +65,7 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
                         </div>
                         <div className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5" />
-                            <span>{article.date}</span>
+                            <span>{formatDate(article.date)}</span>
                         </div>
                     </div>
                 </CardContent>
@@ -63,12 +75,12 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
       </div>
 
       <div className="flex justify-center items-center gap-4 pt-4">
-        <Button asChild variant="outline" disabled={!prevPage}>
-            <Link href={prevPage ? `/news?page=${prevPage}` : '#'}>Sebelumnya</Link>
+        <Button asChild variant="outline" disabled={!prevPageNum}>
+            <Link href={prevPageNum ? `/news?page=${prevPageNum}` : '#'}>Sebelumnya</Link>
         </Button>
         <span className="text-sm text-muted-foreground">Halaman {currentPageNum} dari {totalPages}</span>
         <Button asChild variant="outline" disabled={!nextPage}>
-            <Link href={nextPage ? `/news?page=${nextPage}&prevPage=${page || ''}` : '#'}>Berikutnya</Link>
+            <Link href={nextPage ? `/news?page=${nextPage}` : '#'}>Berikutnya</Link>
         </Button>
       </div>
     </div>

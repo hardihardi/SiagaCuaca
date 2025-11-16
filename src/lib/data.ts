@@ -1,7 +1,5 @@
 
 import type { NewsArticle, NewsApiResponse } from '@/lib/types';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 // Mock data for weather, earthquake, and alerts
 export const getWeatherData = async (location: string) => {
@@ -50,33 +48,65 @@ export const getAlertsData = async () => {
     ]
 }
 
-
-const mockNewsData = [
-  { id: 'news-1', title: 'Musim Kemarau 2024 Diprediksi Lebih Basah dari Biasanya', description: 'BMKG memprediksi bahwa musim kemarau tahun ini akan diwarnai oleh hujan sporadis di beberapa wilayah Indonesia.', content: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) merilis prakiraan terbaru untuk musim kemarau 2024. Tidak seperti tahun-tahun sebelumnya, musim kemarau kali ini diprediksi akan lebih basah akibat pengaruh anomali iklim global. Fenomena ini dapat menyebabkan hujan dengan intensitas ringan hingga sedang terjadi secara sporadis, terutama di wilayah Indonesia bagian barat dan tengah. Petani diimbau untuk menyesuaikan jadwal tanam mereka.', category: 'Iklim', date: '2024-08-04', imageUrl: 'https://picsum.photos/seed/news1/600/400', imageHint: 'dry season', source: 'BMKG', link: '#' },
-  { id: 'news-2', title: 'Waspada Potensi Angin Kencang di Pesisir Selatan Jawa', description: 'Angin kencang dengan kecepatan mencapai 30 knot berpotensi terjadi di sepanjang pesisir selatan Jawa.', content: 'BMKG mengeluarkan peringatan dini terkait potensi angin kencang di wilayah pesisir selatan Jawa, mulai dari Banten hingga Jawa Timur. Kecepatan angin diperkirakan dapat mencapai 30 knot, yang berisiko bagi aktivitas pelayaran dan perikanan. Masyarakat diimbau untuk selalu waspada dan mengikuti informasi terbaru dari pihak berwenang.', category: 'Cuaca', date: '2024-08-03', imageUrl: 'https://picsum.photos/seed/news2/600/400', imageHint: 'strong wind', source: 'CNN Indonesia', link: '#' },
-  { id: 'news-3', title: 'Edukasi Mitigasi Bencana Gempa Bumi Sejak Dini', description: 'Pemerintah menggalakkan program edukasi mitigasi bencana gempa bumi di sekolah-sekolah dasar.', content: 'Sebagai negara yang rawan gempa, edukasi mitigasi bencana menjadi sangat penting. Pemerintah melalui Badan Nasional Penanggulangan Bencana (BNPB) meluncurkan program "Sekolah Aman Bencana" yang menyasar siswa sekolah dasar. Program ini mengajarkan langkah-langkah penyelamatan diri seperti "drop, cover, and hold on" melalui metode yang interaktif dan mudah dipahami anak-anak.', category: 'Bencana', date: '2024-08-02', imageUrl: 'https://picsum.photos/seed/news3/600/400', imageHint: 'earthquake drill', source: 'Kompas', link: '#' },
-  { id: 'news-4', title: 'Teknologi AI Bantu Prediksi Cuaca Lebih Akurat', description: 'Penerapan kecerdasan buatan (AI) dalam pemodelan cuaca menunjukkan hasil yang menjanjikan.', content: 'Para peneliti di Institut Teknologi Bandung (ITB) berhasil mengembangkan model prediksi cuaca berbasis AI yang mampu memberikan prakiraan dengan tingkat akurasi lebih tinggi dibandingkan metode konvensional. Model ini menganalisis jutaan data historis cuaca untuk mengenali pola-pola kompleks, sehingga dapat memprediksi perubahan cuaca ekstrem dengan lebih baik.', category: 'Teknologi', date: '2024-08-01', imageUrl: 'https://picsum.photos/seed/news4/600/400', imageHint: 'AI technology', source: 'Detik', link: '#' },
-];
+const mapArticle = (article: any): NewsArticle => ({
+    id: article.article_id,
+    title: article.title,
+    description: article.description,
+    content: article.content,
+    category: article.category?.[0] || 'Umum',
+    date: article.pubDate,
+    imageUrl: article.image_url || `https://picsum.photos/seed/${article.article_id}/600/400`,
+    imageHint: article.category?.[0] || 'news',
+    source: article.source_id || 'Tidak diketahui',
+    link: article.link,
+});
 
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
-    // This is a mock implementation
-    const pageNum = page ? parseInt(page.split('_')[0], 10) : 1;
-    const pageSize = 10;
-    const totalResults = mockNewsData.length;
-    const totalPages = Math.ceil(totalResults / pageSize);
-    const startIndex = (pageNum - 1) * pageSize;
-    const results = mockNewsData.slice(startIndex, startIndex + pageSize);
+    const apiKey = process.env.NEWSDATA_API_KEY;
+    if (!apiKey) {
+        console.error("News API key is not configured in .env file.");
+        return { results: [], nextPage: null, totalResults: 0 };
+    }
 
-    const nextPage = pageNum < totalPages ? `${pageNum + 1}_${Date.now()}` : null;
-    
-    return {
-        results,
-        nextPage,
-        totalResults
-    };
+    let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=Bmkg&language=id`;
+    if (page) {
+        url += `&page=${page}`;
+    }
+
+    try {
+        const response = await fetch(url, { next: { revalidate: 3600 } }); // Cache for 1 hour
+        if (!response.ok) {
+            console.error("News API request failed with status:", response.status);
+            const errorBody = await response.text();
+            console.error("Error body:", errorBody);
+            throw new Error(`Gagal mengambil data berita: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        return {
+            results: data.results.map(mapArticle),
+            nextPage: data.nextPage || null,
+            totalResults: data.totalResults
+        };
+    } catch (error) {
+        console.error("Error fetching news data:", error);
+        return { results: [], nextPage: null, totalResults: 0 };
+    }
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    // This is a mock implementation
-    return mockNewsData.find((article) => article.id === id);
+    // newsdata.io doesn't have a direct lookup by ID, so we fetch the list and find it.
+    // This is inefficient and should be improved with a proper backend/DB in a real app.
+    const { results } = await getNewsData();
+    const article = results.find((article) => article.id === id);
+
+    // If not found on the first page, we can't reliably find it without more complex logic.
+    // For this app, we'll assume it's on the first page or we return undefined.
+    if (article) {
+        return article;
+    }
+    
+    // As a fallback, try to fetch all pages (not recommended for production)
+    // This is a simplified example.
+    return undefined;
 };

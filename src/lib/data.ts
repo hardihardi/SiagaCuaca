@@ -48,65 +48,40 @@ export const getAlertsData = async () => {
     ]
 }
 
-const mapArticle = (article: any): NewsArticle => ({
-    id: article.article_id,
-    title: article.title,
-    description: article.description,
-    content: article.content,
-    category: article.category?.[0] || 'Umum',
-    date: article.pubDate,
-    imageUrl: article.image_url || `https://picsum.photos/seed/${article.article_id}/600/400`,
-    imageHint: article.category?.[0] || 'news',
-    source: article.source_id || 'Tidak diketahui',
-    link: article.link,
-});
+const mockNewsData: NewsArticle[] = [
+    { id: '1', title: 'BMKG Prediksi Musim Kemarau Lebih Kering Tahun Ini', description: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) memprediksi musim kemarau tahun ini akan lebih kering dibandingkan tahun sebelumnya.', content: 'Kepala BMKG, Dwikorita Karnawati, menyatakan bahwa fenomena El Nino yang lemah menjadi penyebab utama musim kemarau yang lebih kering. Masyarakat diimbau untuk waspada terhadap potensi kekeringan dan kebakaran hutan.', category: 'Iklim', date: '2024-08-05T10:00:00Z', imageUrl: 'https://asset.kompas.com/crops/example1.jpg', imageHint: 'dry land', source: 'Kompas.com', link: 'https://kompas.com' },
+    { id: '2', title: 'Gempa M 5.2 Guncang Sukabumi, Tidak Berpotensi Tsunami', description: 'Gempa bumi dengan magnitudo 5.2 mengguncang wilayah Sukabumi, Jawa Barat. BMKG memastikan gempa ini tidak berpotensi tsunami.', content: 'Pusat gempa berada di laut pada kedalaman 10 km. Guncangan dirasakan oleh warga di beberapa wilayah sekitar, namun belum ada laporan kerusakan signifikan. Warga diimbau untuk tetap tenang.', category: 'Gempa', date: '2024-08-05T14:40:00Z', imageUrl: 'https://media.suara.com/pictures/970x545/2024/01/01/example2.jpg', imageHint: 'earthquake map', source: 'Suara.com', link: 'https://suara.com' },
+    { id: '3', title: 'Waspada Gelombang Tinggi di Perairan Selatan Jawa', description: 'BMKG mengeluarkan peringatan dini terkait potensi gelombang tinggi di perairan selatan Jawa, Bali, dan Nusa Tenggara.', content: 'Gelombang setinggi 2.5 hingga 4 meter berpotensi terjadi dalam beberapa hari ke depan. Nelayan dan masyarakat yang beraktivitas di pesisir diimbau untuk meningkatkan kewaspadaan.', category: 'Cuaca', date: '2024-08-04T08:00:00Z', imageUrl: 'https://cdn.antaranews.com/cache/800x533/2023/12/26/example3.jpg', imageHint: 'ocean waves', source: 'Antara News', link: 'https://antaranews.com' },
+    { id: '4', title: 'Pentingnya Edukasi Mitigasi Bencana Sejak Dini', description: 'Artikel membahas pentingnya edukasi mitigasi bencana kepada anak-anak usia sekolah untuk membangun kesadaran dan kesiapsiagaan.', content: 'Program edukasi yang interaktif dan mudah dipahami dapat membantu anak-anak mengenali potensi bencana di lingkungan mereka dan mengetahui langkah-langkah penyelamatan diri yang dasar.', category: 'Edukasi', date: '2024-08-03T11:00:00Z', imageUrl: 'https://img.antaranews.com/cache/800x533/2022/01/01/example4.jpg', imageHint: 'children learning', source: 'Antara News', link: 'https://antaranews.com' },
+];
 
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
-    const apiKey = process.env.NEWSDATA_API_KEY;
-    if (!apiKey) {
-        console.error("News API key is not configured in .env file.");
-        return { results: [], nextPage: null, totalResults: 0 };
-    }
-
-    let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=Bmkg&language=id`;
-    if (page) {
-        url += `&page=${page}`;
-    }
-
-    try {
-        const response = await fetch(url, { next: { revalidate: 3600 } }); // Cache for 1 hour
-        if (!response.ok) {
-            console.error("News API request failed with status:", response.status);
-            const errorBody = await response.text();
-            console.error("Error body:", errorBody);
-            throw new Error(`Gagal mengambil data berita: ${response.statusText}`);
-        }
-        const data = await response.json();
-        
-        return {
-            results: data.results.map(mapArticle),
-            nextPage: data.nextPage || null,
-            totalResults: data.totalResults
-        };
-    } catch (error) {
-        console.error("Error fetching news data:", error);
-        return { results: [], nextPage: null, totalResults: 0 };
-    }
+    const pageNum = page ? parseInt(page) : 1;
+    const pageSize = 10;
+    const totalResults = mockNewsData.length * 5; // Simulate more results
+    
+    const results = mockNewsData.map(article => ({
+        ...article,
+        id: `${article.id}-${pageNum}`,
+    }));
+    
+    return Promise.resolve({
+        results: results.slice(0, pageSize),
+        nextPage: (pageNum * pageSize < totalResults) ? (pageNum + 1).toString() : null,
+        totalResults: totalResults
+    });
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    // newsdata.io doesn't have a direct lookup by ID, so we fetch the list and find it.
-    // This is inefficient and should be improved with a proper backend/DB in a real app.
-    const { results } = await getNewsData();
-    const article = results.find((article) => article.id === id);
-
-    // If not found on the first page, we can't reliably find it without more complex logic.
-    // For this app, we'll assume it's on the first page or we return undefined.
+    // In mock data, find the base article and append the ID specifics
+    const baseId = id.split('-')[0];
+    const article = mockNewsData.find((article) => article.id === baseId);
     if (article) {
-        return article;
+        return {
+            ...article,
+            id: id,
+            title: `${article.title} (Berita ID: ${id})`, // Make title unique for detail page
+        };
     }
-    
-    // As a fallback, try to fetch all pages (not recommended for production)
-    // This is a simplified example.
-    return undefined;
+    return Promise.resolve(undefined);
 };

@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "earthquake-map",
+      "description": "A map of Indonesia to show earthquake location",
+      "imageUrl": "https://images.unsplash.com/photo-1732851604627-d7a495712881?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxpbmRvbmVzaWElMjBtYXB8ZW58MHx8fHwxNzYzMjk0NDIxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indonesia map"
+    }
+  ]
 }

@@ -1,8 +1,7 @@
-
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { getWeatherData } from '@/lib/data';
+import { getWeatherData, getEarthquakeData } from '@/lib/data';
 import WeatherSummary from '@/components/dashboard/weather-summary';
 import EarthquakeSummary from '@/components/dashboard/earthquake-summary';
 import AlertsSummary from '@/components/dashboard/alerts-summary';
@@ -10,7 +9,7 @@ import NewsSummary from '@/components/dashboard/news-summary';
 import LocationHandler from '@/components/dashboard/location-handler';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WeatherData } from '@/lib/types';
+import { WeatherData, EarthquakeData } from '@/lib/types';
 
 function WeatherSection({ weatherData }: { weatherData: WeatherData }) {
   return <WeatherSummary initialData={weatherData} />;
@@ -65,6 +64,23 @@ const NewsSkeleton = () => (
 export default function DashboardPage() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [isWeatherLoading, setWeatherLoading] = useState(true);
+  const [earthquakeData, setEarthquakeData] = useState<EarthquakeData[] | null>(null);
+  const [isEarthquakeLoading, setEarthquakeLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchEarthquake() {
+        try {
+            const data = await getEarthquakeData();
+            setEarthquakeData(data);
+        } catch (error) {
+            console.error("Failed to fetch earthquake data:", error);
+            setEarthquakeData([]);
+        } finally {
+            setEarthquakeLoading(false);
+        }
+    }
+    fetchEarthquake();
+  }, []);
 
   const handleLocationChange = async (location: string) => {
     try {
@@ -86,9 +102,11 @@ export default function DashboardPage() {
           {isWeatherLoading || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
         </div>
         <div className="space-y-6 md:space-y-8">
-          <Suspense fallback={<SummarySkeleton />}>
-            <EarthquakeSummary />
-          </Suspense>
+          {isEarthquakeLoading || !earthquakeData ? (
+              <SummarySkeleton />
+          ) : (
+              <EarthquakeSummary initialData={earthquakeData} />
+          )}
           <Suspense fallback={<AlertsSkeleton />}>
             <AlertsSummary />
           </Suspense>
@@ -102,4 +120,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

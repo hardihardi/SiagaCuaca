@@ -29,6 +29,7 @@ export default function NewsSummary({ initialData }: { initialData: NewsArticle[
                                         fill
                                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                                         data-ai-hint={article.imageHint}
+                                        unoptimized
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                                     <div className="absolute bottom-0 left-0 p-4">

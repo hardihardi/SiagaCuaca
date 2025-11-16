@@ -1,5 +1,6 @@
-"use client";
+
 import Image from 'next/image';
+import { getNewsData } from "@/lib/data";
 import type { NewsArticle } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,9 @@ import { ChevronRight, Calendar, Tag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 
-export default function NewsSummary({ initialData }: { initialData: NewsArticle[] }) {
+export default async function NewsSummary() {
+    const { results: initialData } = await getNewsData();
+    
     if (!initialData || !Array.isArray(initialData)) {
         return null; 
     }

@@ -2,7 +2,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { getWeatherData, getEarthquakeData, getAlertsData, getNewsData } from '@/lib/data';
+import { getWeatherData } from '@/lib/data';
 import WeatherSummary from '@/components/dashboard/weather-summary';
 import EarthquakeSummary from '@/components/dashboard/earthquake-summary';
 import AlertsSummary from '@/components/dashboard/alerts-summary';
@@ -10,22 +10,10 @@ import NewsSummary from '@/components/dashboard/news-summary';
 import LocationHandler from '@/components/dashboard/location-handler';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WeatherData, EarthquakeData, AlertData, NewsArticle } from '@/lib/types';
+import { WeatherData } from '@/lib/types';
 
 function WeatherSection({ weatherData }: { weatherData: WeatherData }) {
   return <WeatherSummary initialData={weatherData} />;
-}
-
-function EarthquakeSection({ initialData }: { initialData: EarthquakeData[] }) {
-    return <EarthquakeSummary initialData={initialData} />;
-}
-
-function AlertsSection({ initialData }: { initialData: AlertData[] }) {
-    return <AlertsSummary initialData={initialData} />;
-}
-
-function NewsSection({ initialData }: { initialData: NewsArticle[] }) {
-    return <NewsSummary initialData={initialData} />;
 }
 
 const SummarySkeleton = () => (
@@ -76,44 +64,17 @@ const NewsSkeleton = () => (
 
 export default function DashboardPage() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [earthquakeData, setEarthquakeData] = useState<EarthquakeData[] | null>(null);
-  const [alertsData, setAlertsData] = useState<AlertData[] | null>(null);
-  const [newsData, setNewsData] = useState<NewsArticle[] | null>(null);
-  const [loading, setLoading] = useState({
-      weather: true,
-      static: true,
-  });
-
-  useEffect(() => {
-    const fetchStaticData = async () => {
-      try {
-        setLoading(prev => ({...prev, static: true}));
-        const [earthquakes, alerts, newsResponse] = await Promise.all([
-          getEarthquakeData(),
-          getAlertsData(),
-          getNewsData()
-        ]);
-        setEarthquakeData(earthquakes);
-        setAlertsData(alerts);
-        setNewsData(newsResponse.results);
-      } catch (error) {
-        console.error("Failed to fetch static data:", error);
-      } finally {
-        setLoading(prev => ({...prev, static: false}));
-      }
-    };
-    fetchStaticData();
-  }, []);
+  const [isWeatherLoading, setWeatherLoading] = useState(true);
 
   const handleLocationChange = async (location: string) => {
     try {
-      setLoading(prev => ({...prev, weather: true}));
+      setWeatherLoading(true);
       const weather = await getWeatherData(location);
       setWeatherData(weather);
     } catch (error) {
       console.error("Failed to fetch weather data:", error);
     } finally {
-      setLoading(prev => ({...prev, weather: false}));
+      setWeatherLoading(false);
     }
   };
 
@@ -122,16 +83,23 @@ export default function DashboardPage() {
       <LocationHandler onLocationChange={handleLocationChange} />
       <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
         <div className="lg:col-span-2 grid gap-6 md:gap-8">
-          {loading.weather || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
+          {isWeatherLoading || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
         </div>
         <div className="space-y-6 md:space-y-8">
-          {loading.static || !earthquakeData ? <SummarySkeleton /> : <EarthquakeSection initialData={earthquakeData} />}
-          {loading.static || !alertsData ? <AlertsSkeleton /> : <AlertsSection initialData={alertsData} />}
+          <Suspense fallback={<SummarySkeleton />}>
+            <EarthquakeSummary />
+          </Suspense>
+          <Suspense fallback={<AlertsSkeleton />}>
+            <AlertsSummary />
+          </Suspense>
         </div>
       </div>
       <div className="grid gap-6 md:gap-8">
-        {loading.static || !newsData ? <NewsSkeleton /> : <NewsSection initialData={newsData} />}
+        <Suspense fallback={<NewsSkeleton />}>
+            <NewsSummary />
+        </Suspense>
       </div>
     </div>
   );
 }
+

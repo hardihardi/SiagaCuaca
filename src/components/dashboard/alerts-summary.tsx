@@ -1,11 +1,14 @@
-"use client";
+
 import type { AlertData } from "@/lib/types";
+import { getAlertsData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { AlertTriangle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 
-export default function AlertsSummary({ initialData }: { initialData: AlertData[] }) {
+export default async function AlertsSummary() {
+    const initialData = await getAlertsData();
+
     return (
         <Card className="flex flex-col">
             <CardHeader>

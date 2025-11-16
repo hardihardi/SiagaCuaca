@@ -1,5 +1,6 @@
-"use client";
+
 import Image from 'next/image';
+import { getEarthquakeData } from "@/lib/data";
 import type { EarthquakeData } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -8,7 +9,8 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export default function EarthquakeSummary({ initialData }: { initialData: EarthquakeData[] }) {
+export default async function EarthquakeSummary() {
+    const initialData = await getEarthquakeData();
     const latestEarthquake = initialData[0];
     const mapImage = PlaceHolderImages.find(p => p.id === 'earthquake-map');
 

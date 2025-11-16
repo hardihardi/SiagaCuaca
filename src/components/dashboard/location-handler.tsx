@@ -17,13 +17,15 @@ export default function LocationHandler({ onLocationChange }: { onLocationChange
 
   useEffect(() => {
     // Initial fetch for default location
-    onLocationChange(searchQuery);
+    if(searchQuery) {
+      onLocationChange(searchQuery);
+    }
   }, []);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
       onLocationChange(searchQuery);
-      router.push(`/weather?location=${searchQuery}`);
+      router.push(`/?location=${searchQuery}`);
     }
   };
 
@@ -47,7 +49,7 @@ export default function LocationHandler({ onLocationChange }: { onLocationChange
         const mockLocation = "Bandung";
         setSearchQuery(mockLocation);
         onLocationChange(mockLocation);
-        router.push(`/weather?location=${mockLocation}`);
+        router.push(`/?location=${mockLocation}`);
         toast({
           title: "Lokasi ditemukan",
           description: `Menampilkan cuaca untuk ${mockLocation}.`,

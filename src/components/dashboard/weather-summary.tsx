@@ -49,7 +49,7 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
 
   return (
     <Card>
-        <Link href={`/weather?location=${initialData.location.split(',')[0]}`} className="hover:bg-muted/50 block rounded-lg">
+        <Link href={`/weather?location=${initialData.location.split(',')[0]}`} className="hover:bg-muted/50 block rounded-lg transition-colors">
             <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                 <span>Cuaca Saat Ini</span>
@@ -98,4 +98,3 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
     </Card>
   );
 }
-

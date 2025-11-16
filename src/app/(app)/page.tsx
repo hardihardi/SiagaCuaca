@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { getWeatherData, getEarthquakeData, getAlertsData, getNewsData } from '@/lib/data';
 import WeatherSummary from '@/components/dashboard/weather-summary';
 import EarthquakeSummary from '@/components/dashboard/earthquake-summary';
@@ -10,26 +10,24 @@ import NewsSummary from '@/components/dashboard/news-summary';
 import LocationHandler from '@/components/dashboard/location-handler';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WeatherData } from '@/lib/types';
+import { WeatherData, EarthquakeData, AlertData, NewsArticle } from '@/lib/types';
 
 function WeatherSection({ weatherData }: { weatherData: WeatherData }) {
   return <WeatherSummary initialData={weatherData} />;
 }
 
-function EarthquakeSection({ initialData }: { initialData: Awaited<ReturnType<typeof getEarthquakeData>> }) {
+function EarthquakeSection({ initialData }: { initialData: EarthquakeData[] }) {
     return <EarthquakeSummary initialData={initialData} />;
 }
 
-function AlertsSection({ initialData }: { initialData: Awaited<ReturnType<typeof getAlertsData>> }) {
+function AlertsSection({ initialData }: { initialData: AlertData[] }) {
     return <AlertsSummary initialData={initialData} />;
 }
 
-function NewsSection({ initialData }: { initialData: Awaited<ReturnType<typeof getNewsData>> }) {
+function NewsSection({ initialData }: { initialData: NewsArticle[] }) {
     return <NewsSummary initialData={initialData} />;
 }
 
-
-// Skeletons for Suspense fallbacks
 const SummarySkeleton = () => (
   <Card>
     <CardHeader>
@@ -78,28 +76,44 @@ const NewsSkeleton = () => (
 
 export default function DashboardPage() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [earthquakeData, setEarthquakeData] = useState<Awaited<ReturnType<typeof getEarthquakeData>> | null>(null);
-  const [alertsData, setAlertsData] = useState<Awaited<ReturnType<typeof getAlertsData>> | null>(null);
-  const [newsData, setNewsData] = useState<Awaited<ReturnType<typeof getNewsData>> | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [earthquakeData, setEarthquakeData] = useState<EarthquakeData[] | null>(null);
+  const [alertsData, setAlertsData] = useState<AlertData[] | null>(null);
+  const [newsData, setNewsData] = useState<NewsArticle[] | null>(null);
+  const [loading, setLoading] = useState({
+      weather: true,
+      static: true,
+  });
+
+  useEffect(() => {
+    const fetchStaticData = async () => {
+      try {
+        setLoading(prev => ({...prev, static: true}));
+        const [earthquakes, alerts, news] = await Promise.all([
+          getEarthquakeData(),
+          getAlertsData(),
+          getNewsData()
+        ]);
+        setEarthquakeData(earthquakes);
+        setAlertsData(alerts);
+        setNewsData(news);
+      } catch (error) {
+        console.error("Failed to fetch static data:", error);
+      } finally {
+        setLoading(prev => ({...prev, static: false}));
+      }
+    };
+    fetchStaticData();
+  }, []);
 
   const handleLocationChange = async (location: string) => {
-    setLoading(true);
     try {
-      const [weather, earthquakes, alerts, news] = await Promise.all([
-        getWeatherData(location),
-        getEarthquakeData(),
-        getAlertsData(),
-        getNewsData()
-      ]);
+      setLoading(prev => ({...prev, weather: true}));
+      const weather = await getWeatherData(location);
       setWeatherData(weather);
-      setEarthquakeData(earthquakes);
-      setAlertsData(alerts);
-      setNewsData(news);
     } catch (error) {
-      console.error("Failed to fetch data:", error);
+      console.error("Failed to fetch weather data:", error);
     } finally {
-      setLoading(false);
+      setLoading(prev => ({...prev, weather: false}));
     }
   };
 
@@ -107,12 +121,12 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <LocationHandler onLocationChange={handleLocationChange} />
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {loading || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
-        {loading || !earthquakeData ? <SummarySkeleton /> : <EarthquakeSection initialData={earthquakeData} />}
-        {loading || !alertsData ? <AlertsSkeleton /> : <AlertsSection initialData={alertsData} />}
+        {loading.weather || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
+        {loading.static || !earthquakeData ? <SummarySkeleton /> : <EarthquakeSection initialData={earthquakeData} />}
+        {loading.static || !alertsData ? <AlertsSkeleton /> : <AlertsSection initialData={alertsData} />}
       </div>
       <div className="grid gap-6">
-        {loading || !newsData ? <NewsSkeleton /> : <NewsSection initialData={newsData} />}
+        {loading.static || !newsData ? <NewsSkeleton /> : <NewsSection initialData={newsData} />}
       </div>
     </div>
   );

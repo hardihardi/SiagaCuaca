@@ -39,4 +39,5 @@ export interface NewsArticle {
   imageUrl: string;
   imageHint: string;
   source: string;
+  link?: string;
 }

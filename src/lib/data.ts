@@ -1,4 +1,6 @@
 import type { WeatherData, EarthquakeData, AlertData, NewsArticle } from '@/lib/types';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 export const getWeatherData = async (location: string): Promise<WeatherData> => {
   // Mock data, in a real app this would fetch from BMKG API
@@ -49,16 +51,36 @@ export const getAlertsData = async (): Promise<AlertData[]> => {
 }
 
 export const getNewsData = async (): Promise<NewsArticle[]> => {
-    // Mock data
-    return [
-        { id: "1", title: "Memahami Skala Magnitudo Gempa Bumi dan Dampaknya", category: "Edukasi", date: "5 Agu 2024", imageUrl: "https://picsum.photos/seed/news1/600/400", imageHint: "earthquake infographic", source: "BMKG" },
-        { id: "2", title: "Musim Kemarau 2024: BMKG Prediksi Puncak Terjadi di Agustus", category: "Iklim", date: "4 Agu 2024", imageUrl: "https://picsum.photos/seed/news2/600/400", imageHint: "dry season", source: "Info Iklim" },
-        { id: "3", title: "Teknologi Modifikasi Cuaca untuk Atasi Kekeringan", category: "Teknologi", date: "3 Agu 2024", imageUrl: "https://picsum.photos/seed/news3/600/400", imageHint: "cloud seeding", source: "Info Cuaca" },
-        { id: "4", title: "Kenali Jenis-jenis Awan dan Potensi Cuaca yang Dibawa", category: "Cuaca", date: "2 Agu 2024", imageUrl: "https://picsum.photos/seed/news4/600/400", imageHint: "cumulonimbus cloud", source: "BMKG" },
-    ]
-}
+  const apiKey = 'pub_066ffdf224864fe188a72234ee07c9bf';
+  const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=BMKG&language=id`;
+  try {
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+        console.error("Failed to fetch news:", response.statusText);
+        return [];
+    }
+    const data = await response.json();
+    
+    return data.results.map((article: any, index: number) => ({
+      id: article.article_id || `${index}`,
+      title: article.title,
+      category: article.category?.[0] || "Berita",
+      date: article.pubDate ? format(new Date(article.pubDate), "d MMM yyyy", { locale: id }) : "Tanggal tidak tersedia",
+      imageUrl: article.image_url || `https://picsum.photos/seed/news${index}/600/400`,
+      imageHint: article.keywords?.join(' ') || "berita cuaca",
+      source: article.source_id || "Sumber tidak diketahui",
+      link: article.link,
+    }));
+  } catch (error) {
+    console.error("Error fetching or parsing news data:", error);
+    return [];
+  }
+};
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
+    // This function will now find the article from the fetched data.
+    // For simplicity in this context, we will fetch all and find,
+    // in a real-world scenario with a proper backend, you would fetch a single article by ID.
     const articles = await getNewsData();
     return articles.find(article => article.id === id);
 }

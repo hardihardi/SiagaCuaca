@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default async function NewsDetailPage({ params }: { params: { id: string } }) {
   const article = await getNewsArticleById(params.id);
@@ -53,34 +55,32 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
                     fill
                     className="object-cover"
                     data-ai-hint={article.imageHint}
+                    unoptimized
                 />
             </div>
 
             <Card>
                 <CardContent className="pt-6">
-                    <div className="prose prose-lg max-w-none dark:prose-invert prose-p:text-foreground/80 prose-headings:text-foreground">
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                        </p>
-                        <p>
-                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida.
-                        </p>
-                        <h3 className="font-bold">Sub-judul Penting</h3>
-                        <p>
-                            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
-                        </p>
-                    </div>
+                    <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>Konten Artikel</AlertTitle>
+                        <AlertDescription>
+                            Konten artikel lengkap tidak tersedia di aplikasi ini. Silakan kunjungi sumber asli untuk membaca lebih lanjut.
+                        </AlertDescription>
+                    </Alert>
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end">
-                <Button asChild variant="secondary">
-                    <Link href="#" target="_blank">
-                        Baca Selengkapnya di {article.source}
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </div>
+            {article.link && (
+                <div className="flex justify-end">
+                    <Button asChild variant="secondary">
+                        <Link href={article.link} target="_blank">
+                            Baca Selengkapnya di {article.source}
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </div>
+            )}
         </article>
     </div>
   );

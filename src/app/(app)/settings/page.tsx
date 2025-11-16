@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   
+  const [userData, setUserData] = useState<any>(null);
   const [earthquakeNotif, setEarthquakeNotif] = useState(false);
   const [weatherAlertNotif, setWeatherAlertNotif] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,8 +39,18 @@ export default function SettingsPage() {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
+          setUserData(data);
           setEarthquakeNotif(data.earthquakeNotif ?? false);
           setWeatherAlertNotif(data.weatherAlertNotif ?? true);
+        } else {
+          // If the doc doesn't exist, we might be creating it for the first time
+          // Set initial state for a new user document
+          const newUserScaffold = {
+            id: user?.uid,
+            clerkId: '', // You might need to populate this if using Clerk
+            createdAt: serverTimestamp(), // Will be set on the server
+          };
+          setUserData(newUserScaffold);
         }
       } catch (error) {
         console.error("Error fetching user settings:", error);
@@ -53,17 +64,18 @@ export default function SettingsPage() {
       }
     };
 
-    if (!isUserLoading) {
+    if (!isUserLoading && user) {
         fetchSettings();
     }
   }, [user, userDocRef, toast, isUserLoading]);
 
 
   const handleSaveChanges = async () => {
-    if (!userDocRef) return;
+    if (!userDocRef || !userData) return;
     setIsSaving(true);
     
     const settingsData = { 
+      ...userData, // Include existing user data
       earthquakeNotif, 
       weatherAlertNotif,
       updatedAt: serverTimestamp()

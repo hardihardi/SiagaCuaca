@@ -127,8 +127,11 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
             return mapApiArticleToNewsArticle(article);
         }
 
+        // If not found, it might be on another page, but the API doesn't support deep searching by ID easily.
+        // For this demo, we'll assume it's on the first page or not found.
         console.warn(`Article with ID ${id} not found on the first page of results.`);
         return undefined;
+
     } catch (error) {
         console.error(`Error fetching article by ID ${id}:`, error);
         return undefined;

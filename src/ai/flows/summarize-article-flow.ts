@@ -11,8 +11,8 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { initializeFirebase } from '@/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeAdmin } from '@/firebase/admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 
 const SummarizeArticleInputSchema = z.object({
@@ -50,17 +50,17 @@ const summarizeArticleFlow = ai.defineFlow(
     outputSchema: SummarizeArticleOutputSchema,
   },
   async input => {
-    const { firestore } = initializeFirebase();
+    const { firestore } = initializeAdmin();
     const { articleId, articleContent } = input;
     
     // Define the document reference for the cached summary
-    const summaryDocRef = doc(firestore, 'article_summaries', articleId);
+    const summaryDocRef = firestore.collection('article_summaries').doc(articleId);
 
     // 1. Check if a summary already exists in Firestore
-    const docSnap = await getDoc(summaryDocRef);
-    if (docSnap.exists()) {
+    const docSnap = await summaryDocRef.get();
+    if (docSnap.exists) {
       // If it exists, return the cached summary
-      return { summary: docSnap.data().summary };
+      return { summary: docSnap.data()!.summary };
     }
 
     // 2. If not cached, generate a new summary
@@ -68,10 +68,10 @@ const summarizeArticleFlow = ai.defineFlow(
     const newSummary = output!.summary;
 
     // 3. Save the new summary to Firestore for future requests
-    await setDoc(summaryDocRef, {
+    await summaryDocRef.set({
       articleId: articleId,
       summary: newSummary,
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     // 4. Return the newly generated summary

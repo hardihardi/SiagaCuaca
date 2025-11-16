@@ -1,0 +1,170 @@
+/**
+ * @fileoverview Firestore Security Rules for IndoWeatherAlert application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles and notification settings,
+ * while allowing public read access to location, weather forecast, and earthquake data. Write
+ * access to these public collections is restricted to authorized services (not implemented in this prototype).
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile data. Only the user can read or write their own profile.
+ * - /locations/{locationId}: Stores location data. Publicly readable.
+ * - /weather_forecasts/{weatherForecastId}: Stores weather forecast data. Publicly readable.
+ * - /earthquakes/{earthquakeId}: Stores earthquake data. Publicly readable.
+ * - /weather_alerts/{weatherAlertId}: Stores weather alert data. Publicly readable.
+ * - /users/{userId}/user_notifications/{userNotificationId}: Stores user notification settings.
+ *   Only the user can manage their own notification settings.
+ *
+ * Key Security Decisions:
+ * - Users can only access their own data under /users/{userId}.
+ * - Users can only manage their own notification settings under /users/{userId}/user_notifications/{userNotificationId}.
+ * - Listing of users is disallowed.
+ * - Locations, WeatherForecasts, Earthquakes, and WeatherAlerts are publicly readable.
+ * - Write access to Locations, WeatherForecasts, Earthquakes, and WeatherAlerts is not defined in this prototype.
+ *
+ * Denormalization for Authorization:
+ * - The 'userId' is used in the path for /users/{userId} and /users/{userId}/user_notifications/{userNotificationId},
+ *   and it's assumed to be denormalized within the document itself. This allows for simple authorization
+ *   checks without additional reads.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Manages access to user profile data.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' can create their profile. request.auth.uid == 'user123'
+     * @allow (get) User with ID 'user123' can read their profile. request.auth.uid == 'user123'
+     * @allow (update) User with ID 'user123' can update their profile. request.auth.uid == 'user123'
+     * @allow (delete) User with ID 'user123' can delete their profile. request.auth.uid == 'user123'
+     * @deny (create) User with ID 'user456' cannot create a profile for 'user123'. request.auth.uid != 'user123'
+     * @deny (get) User with ID 'user456' cannot read the profile of 'user123'. request.auth.uid != 'user123'
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      // isSignedIn() checks that the request is authenticated
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // isOwner() checks that the userId matches the authenticated user's UID
+      function isOwner(userId) {
+        return isSignedIn() && request.auth.uid == userId;
+      }
+
+      // isExistingOwner() checks that the userId matches the authenticated user's UID, and that the resource exists.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false; // Listing users is not permitted.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages access to location data. Publicly readable, write access restricted.
+     * @path /locations/{locationId}
+     * @allow (get) Any user can read location data.
+     * @allow (list) Any user can list location data.
+     * @deny (create) No one can create location data (prototype).
+     * @deny (update) No one can update location data (prototype).
+     * @deny (delete) No one can delete location data (prototype).
+     * @principle Publicly readable, write access restricted to authorized services.
+     */
+    match /locations/{locationId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Manages access to weather forecast data. Publicly readable, write access restricted.
+     * @path /weather_forecasts/{weatherForecastId}
+     * @allow (get) Any user can read weather forecast data.
+     * @allow (list) Any user can list weather forecast data.
+     * @deny (create) No one can create weather forecast data (prototype).
+     * @deny (update) No one can update weather forecast data (prototype).
+     * @deny (delete) No one can delete weather forecast data (prototype).
+     * @principle Publicly readable, write access restricted to authorized services.
+     */
+    match /weather_forecasts/{weatherForecastId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Manages access to earthquake data. Publicly readable, write access restricted.
+     * @path /earthquakes/{earthquakeId}
+     * @allow (get) Any user can read earthquake data.
+     * @allow (list) Any user can list earthquake data.
+     * @deny (create) No one can create earthquake data (prototype).
+     * @deny (update) No one can update earthquake data (prototype).
+     * @deny (delete) No one can delete earthquake data (prototype).
+     * @principle Publicly readable, write access restricted to authorized services.
+     */
+    match /earthquakes/{earthquakeId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Manages access to weather alert data. Publicly readable, write access restricted.
+     * @path /weather_alerts/{weatherAlertId}
+     * @allow (get) Any user can read weather alert data.
+     * @allow (list) Any user can list weather alert data.
+     * @deny (create) No one can create weather alert data (prototype).
+     * @deny (update) No one can update weather alert data (prototype).
+     * @deny (delete) No one can delete weather alert data (prototype).
+     * @principle Publicly readable, write access restricted to authorized services.
+     */
+    match /weather_alerts/{weatherAlertId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Manages access to user notification settings.
+     * @path /users/{userId}/user_notifications/{userNotificationId}
+     * @allow (create) User with ID 'user123' can create a notification setting. request.auth.uid == 'user123'
+     * @allow (get) User with ID 'user123' can read their notification settings. request.auth.uid == 'user123'
+     * @allow (update) User with ID 'user123' can update their notification settings. request.auth.uid == 'user123'
+     * @allow (delete) User with ID 'user123' can delete their notification settings. request.auth.uid == 'user123'
+     * @deny (create) User with ID 'user456' cannot create notification settings for 'user123'. request.auth.uid != 'user123'
+     * @deny (get) User with ID 'user456' cannot read notification settings of 'user123'. request.auth.uid != 'user123'
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId}/user_notifications/{userNotificationId} {
+      // isSignedIn() checks that the request is authenticated
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // isOwner() checks that the userId matches the authenticated user's UID
+      function isOwner(userId) {
+        return isSignedIn() && request.auth.uid == userId;
+      }
+
+      // isExistingOwner() checks that the userId matches the authenticated user's UID, and that the resource exists.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}

@@ -1,0 +1,359 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the IndoWeatherAlert application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "clerkId": {
+          "type": "string",
+          "description": "The Clerk-assigned ID for the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was last updated.",
+          "format": "date-time"
+        },
+        "defaultLocation": {
+          "type": "string",
+          "description": "The default location (e.g., city/province code) set by the user for weather forecasts. Reference to Location entity."
+        }
+      },
+      "required": [
+        "id",
+        "clerkId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Location": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Location",
+      "type": "object",
+      "description": "Represents a specific location (province/city) in Indonesia for weather forecasts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Location entity (e.g., province/city code)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the location (e.g., Jakarta, Jawa Barat)."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the location."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the location."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "latitude",
+        "longitude"
+      ]
+    },
+    "WeatherForecast": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WeatherForecast",
+      "type": "object",
+      "description": "Represents weather forecast data for a specific location and time.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WeatherForecast entity."
+        },
+        "locationId": {
+          "type": "string",
+          "description": "Reference to Location. (Relationship: Location 1:N WeatherForecast)"
+        },
+        "forecastTime": {
+          "type": "string",
+          "description": "Timestamp of the forecast.",
+          "format": "date-time"
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Temperature in Celsius."
+        },
+        "humidity": {
+          "type": "number",
+          "description": "Humidity percentage."
+        },
+        "windSpeed": {
+          "type": "number",
+          "description": "Wind speed in km/h."
+        },
+        "rainfall": {
+          "type": "number",
+          "description": "Rainfall in mm."
+        },
+        "weatherCondition": {
+          "type": "string",
+          "description": "Description of the weather condition (e.g., Cloudy, Rainy)."
+        }
+      },
+      "required": [
+        "id",
+        "locationId",
+        "forecastTime",
+        "temperature",
+        "humidity",
+        "windSpeed",
+        "rainfall",
+        "weatherCondition"
+      ]
+    },
+    "Earthquake": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Earthquake",
+      "type": "object",
+      "description": "Represents earthquake data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Earthquake entity."
+        },
+        "time": {
+          "type": "string",
+          "description": "Timestamp of the earthquake event.",
+          "format": "date-time"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the earthquake epicenter."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the earthquake epicenter."
+        },
+        "magnitude": {
+          "type": "number",
+          "description": "Magnitude of the earthquake."
+        },
+        "depth": {
+          "type": "number",
+          "description": "Depth of the earthquake in kilometers."
+        },
+        "locationName": {
+          "type": "string",
+          "description": "Descriptive location name of the earthquake epicenter."
+        }
+      },
+      "required": [
+        "id",
+        "time",
+        "latitude",
+        "longitude",
+        "magnitude",
+        "depth",
+        "locationName"
+      ]
+    },
+    "WeatherAlert": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WeatherAlert",
+      "type": "object",
+      "description": "Represents a severe weather alert issued by BMKG.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WeatherAlert entity."
+        },
+        "locationId": {
+          "type": "string",
+          "description": "Reference to Location. (Relationship: Location 1:N WeatherAlert)"
+        },
+        "issueTime": {
+          "type": "string",
+          "description": "Timestamp when the alert was issued.",
+          "format": "date-time"
+        },
+        "expiryTime": {
+          "type": "string",
+          "description": "Timestamp when the alert expires.",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the weather alert."
+        },
+        "alertType": {
+          "type": "string",
+          "description": "Type of weather alert (e.g., Heavy Rain, Strong Winds)."
+        }
+      },
+      "required": [
+        "id",
+        "locationId",
+        "issueTime",
+        "expiryTime",
+        "description",
+        "alertType"
+      ]
+    },
+    "UserNotification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserNotification",
+      "type": "object",
+      "description": "Represents a notification setting for a user regarding weather or earthquake alerts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserNotification entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N UserNotification)"
+        },
+        "locationId": {
+          "type": "string",
+          "description": "Reference to Location. (Relationship: Location 1:N UserNotification)"
+        },
+        "notificationType": {
+          "type": "string",
+          "description": "Type of notification (e.g., earthquake alert, severe weather warning)."
+        },
+        "threshold": {
+          "type": "number",
+          "description": "Threshold for triggering the notification (e.g., minimum earthquake magnitude)."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Indicates whether the notification is enabled or disabled."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "locationId",
+        "notificationType",
+        "enabled"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Path-based ownership ensures only the user can access their profile data. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, matching the Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/locations/{locationId}",
+        "definition": {
+          "entityName": "Location",
+          "schema": {
+            "$ref": "#/backend/entities/Location"
+          },
+          "description": "Stores location data. Publicly readable, write access restricted to authorized services.",
+          "params": [
+            {
+              "name": "locationId",
+              "description": "The unique identifier for the location (e.g., province/city code)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/weather_forecasts/{weatherForecastId}",
+        "definition": {
+          "entityName": "WeatherForecast",
+          "schema": {
+            "$ref": "#/backend/entities/WeatherForecast"
+          },
+          "description": "Stores weather forecast data. Includes 'locationId' for filtering and association with locations. Write access restricted to authorized services.",
+          "params": [
+            {
+              "name": "weatherForecastId",
+              "description": "The unique identifier for the weather forecast."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/earthquakes/{earthquakeId}",
+        "definition": {
+          "entityName": "Earthquake",
+          "schema": {
+            "$ref": "#/backend/entities/Earthquake"
+          },
+          "description": "Stores earthquake data. Publicly readable, write access restricted to authorized services.",
+          "params": [
+            {
+              "name": "earthquakeId",
+              "description": "The unique identifier for the earthquake event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/weather_alerts/{weatherAlertId}",
+        "definition": {
+          "entityName": "WeatherAlert",
+          "schema": {
+            "$ref": "#/backend/entities/WeatherAlert"
+          },
+          "description": "Stores weather alerts. Includes 'locationId' for filtering and association with locations. Write access restricted to authorized services.",
+          "params": [
+            {
+              "name": "weatherAlertId",
+              "description": "The unique identifier for the weather alert."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/user_notifications/{userNotificationId}",
+        "definition": {
+          "entityName": "UserNotification",
+          "schema": {
+            "$ref": "#/backend/entities/UserNotification"
+          },
+          "description": "Stores user notification settings. Path-based ownership and includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, matching the Firebase Auth UID."
+            },
+            {
+              "name": "userNotificationId",
+              "description": "The unique identifier for the user notification setting."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure security, scalability, and ease of debugging, adhering to the principles of Authorization Independence, Clarity of Intent, DBAC, and QAPs. It avoids hierarchical authorization dependencies by denormalizing authorization data and segregates data based on access needs.\n\n*   **/users/{userId}**: Stores user profiles. Ensures path-based ownership for private data. Each user document is uniquely identified by the `userId`, which corresponds to the Firebase Auth `uid`. This structure supports simple security rules based on `request.auth.uid == userId`.\n*   **/locations/{locationId}**: Stores location data. This is a global collection accessible for reading. Security rules should ensure only authorized services can create or update location data.\n*   **/weather_forecasts/{weatherForecastId}**: Stores weather forecast data. Authorization Independence achieved by storing `locationId` on each `WeatherForecast` document. This enables QAPs, as listing weather forecasts only requires querying this collection.\n*   **/earthquakes/{earthquakeId}**: Stores earthquake data. This is a global collection, readable by all users. Security rules should restrict write access to authorized services only.\n*   **/weather_alerts/{weatherAlertId}**: Stores weather alerts. Authorization Independence achieved by storing `locationId` on each `WeatherAlert` document. This enables QAPs, as listing weather alerts only requires querying this collection.\n*   **/users/{userId}/user_notifications/{userNotificationId}**: Stores user notification settings. Path-based ownership ensures only the user can manage their notifications. The `userId` is denormalized, enabling security rules based on `request.auth.uid == userId` without needing to `get()` parent documents."
+  }
+}

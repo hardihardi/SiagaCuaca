@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { summarizeArticle } from "@/ai/flows/summarize-article-flow";
+import { Suspense } from "react";
 
 function formatDate(dateString: string) {
     if (!dateString) return "Tanggal tidak diketahui";
@@ -21,6 +22,35 @@ function formatDate(dateString: string) {
     }
 }
 
+async function SummarySection({ articleContent }: { articleContent: string }) {
+    const summary = await summarizeArticle({ articleContent });
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Ringkasan</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-muted-foreground whitespace-pre-line">
+                    {summary.summary}
+                </p>
+            </CardContent>
+        </Card>
+    );
+}
+
+const SummarySkeleton = () => (
+    <Card>
+        <CardHeader>
+            <CardTitle>Ringkasan</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+            <p className="h-4 bg-muted rounded w-full"></p>
+            <p className="h-4 bg-muted rounded w-full"></p>
+            <p className="h-4 bg-muted rounded w-3/4"></p>
+        </CardContent>
+    </Card>
+);
+
 export default async function NewsDetailPage({ params }: { params: { id: string } }) {
   const article = await getNewsArticleById(params.id);
 
@@ -28,8 +58,7 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
     notFound();
   }
 
-  // Generate summary using AI
-  const summary = await summarizeArticle({ articleContent: article.content || article.description || "" });
+  const articleContent = article.content || article.description || "";
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -73,16 +102,9 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
                 />
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Ringkasan</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground whitespace-pre-line">
-                        {summary.summary}
-                    </p>
-                </CardContent>
-            </Card>
+            <Suspense fallback={<SummarySkeleton />}>
+                <SummarySection articleContent={articleContent} />
+            </Suspense>
 
             {article.link && (
                 <div className="flex justify-end">

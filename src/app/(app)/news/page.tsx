@@ -26,7 +26,11 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
 
   const currentPageNum = page ? parseInt(page) : 1;
   const totalPages = Math.ceil((totalResults || 10) / 10);
-  const prevPageNum = currentPageNum > 1 ? (currentPageNum - 1).toString() : undefined;
+  
+  // newsdata.io pagination is a string for the next page, not a number
+  const hasPrevPage = currentPageNum > 1;
+  const prevPageNum = hasPrevPage ? (currentPageNum - 1).toString() : undefined;
+
 
   return (
     <div className="space-y-6">
@@ -74,10 +78,10 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
       </div>
 
       <div className="flex justify-center items-center gap-4 pt-4">
-        <Button asChild variant="outline" disabled={!prevPageNum}>
+        <Button asChild variant="outline" disabled={!hasPrevPage}>
             <Link href={prevPageNum ? `/news?page=${prevPageNum}` : '#'}>Sebelumnya</Link>
         </Button>
-        <span className="text-sm text-muted-foreground">Halaman {currentPageNum} dari {totalPages}</span>
+        <span className="text-sm text-muted-foreground">Halaman {currentPageNum}</span>
         <Button asChild variant="outline" disabled={!nextPage}>
             <Link href={nextPage ? `/news?page=${nextPage}` : '#'}>Berikutnya</Link>
         </Button>

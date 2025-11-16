@@ -48,72 +48,66 @@ export const getAlertsData = async () => {
     ]
 }
 
-const mockNewsData: NewsArticle[] = [
-    {
-      id: '1',
-      title: 'BMKG Prediksi Puncak Musim Hujan di Januari-Februari 2025',
-      description: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) memprediksi bahwa puncak musim hujan di sebagian besar wilayah Indonesia akan terjadi pada bulan Januari dan Februari 2025.',
-      content: 'Kepala BMKG, Dwikorita Karnawati, menyatakan bahwa sebagian besar wilayah Indonesia akan memasuki musim hujan mulai akhir tahun ini. "Puncak musim hujan diprakirakan terjadi pada Januari hingga Februari 2025. Masyarakat diimbau untuk waspada terhadap potensi bencana hidrometeorologi seperti banjir dan tanah longsor," ujarnya dalam konferensi pers di Jakarta.',
-      category: 'Cuaca',
-      date: '2024-08-05T10:00:00Z',
-      imageUrl: 'https://asset.kompas.com/crops/example-image-url-1.jpg',
-      imageHint: 'cuaca hujan',
-      source: 'Kompas.com'
-    },
-    {
-      id: '2',
-      title: 'Gempa Magnitudo 5.2 Guncang Sukabumi, Tidak Berpotensi Tsunami',
-      description: 'Gempa bumi dengan magnitudo 5.2 mengguncang wilayah Kabupaten Sukabumi, Jawa Barat. Gempa ini tidak berpotensi menimbulkan tsunami.',
-      content: 'Gempa bumi tektonik terjadi pada pukul 14:35:10 WIB di wilayah Samudera Hindia Selatan Jawa. Hasil analisis BMKG menunjukkan gempa ini memiliki parameter update dengan magnitudo 5.0. Episenter gempa bumi terletak pada koordinat 7,99° LS ; 106,51° BT, atau tepatnya berlokasi di laut pada jarak 125 Km arah Barat Daya Kota Sukabumi, Jawa Barat pada kedalaman 10 km. BMKG menyatakan gempa ini tidak berpotensi tsunami.',
-      category: 'Gempa',
-      date: '2024-08-05T08:00:00Z',
-      imageUrl: 'https://media.suara.com/pictures/970x545/2024/01/01/example-image-url-2.jpg',
-      imageHint: 'peta gempa',
-      source: 'Suara.com'
-    },
-    {
-      id: '3',
-      title: 'Waspada Gelombang Tinggi di Perairan Selatan Jawa',
-      description: 'BMKG mengeluarkan peringatan dini terkait potensi gelombang tinggi yang bisa mencapai 4 meter di perairan selatan Jawa Barat, Jawa Tengah, dan DI Yogyakarta.',
-      content: 'Peringatan ini berlaku selama tiga hari ke depan. BMKG mengimbau nelayan dan masyarakat yang beraktivitas di pesisir untuk selalu waspada dan memperhatikan update informasi cuaca maritim dari BMKG. Pola angin di wilayah Indonesia bagian selatan yang cenderung bergerak dari Timur - Tenggara dengan kecepatan 5 - 25 knot menjadi salah satu penyebabnya.',
-      category: 'Maritim',
-      date: '2024-08-04T12:00:00Z',
-      imageUrl: 'https://cdn.antaranews.com/cache/800x533/2023/12/26/example-image-url-3.jpg',
-      imageHint: 'ombak laut',
-      source: 'Antara News'
-    },
-     {
-      id: '4',
-      title: 'Antisipasi Kekeringan, BMKG dan Kementan Lakukan Modifikasi Cuaca',
-      description: 'Untuk mengatasi dampak El Nino yang menyebabkan kekeringan di sejumlah wilayah, BMKG bekerja sama dengan Kementerian Pertanian untuk melakukan Teknologi Modifikasi Cuaca (TMC).',
-      content: 'Operasi TMC difokuskan pada wilayah-wilayah sentra produksi pangan yang mengalami defisit curah hujan. Diharapkan dengan adanya hujan buatan, kebutuhan air untuk pertanian dapat tercukupi sehingga tidak terjadi gagal panen. Operasi ini direncanakan akan berlangsung selama satu bulan ke depan dengan evaluasi berkala.',
-      category: 'Iklim',
-      date: '2024-08-03T09:30:00Z',
-      imageUrl: 'https://img.antaranews.com/cache/800x533/2023/08/21/WhatsApp-Image-2023-08-21-at-13.43.58.jpeg',
-      imageHint: 'modifikasi cuaca',
-      source: 'Antara News'
-    },
-  ];
+const mapApiArticleToNewsArticle = (article: any): NewsArticle => ({
+    id: article.article_id,
+    title: article.title,
+    description: article.description,
+    content: article.content,
+    category: article.category?.[0] || 'Berita',
+    date: article.pubDate,
+    imageUrl: article.image_url || `https://picsum.photos/seed/${article.article_id}/600/400`,
+    imageHint: article.keywords || 'news article',
+    source: article.source_id,
+    link: article.link,
+});
 
-export const getNewsData = async (page: string = '1'): Promise<NewsApiResponse> => {
-    const pageNum = parseInt(page, 10);
-    const pageSize = 10;
-    const totalResults = mockNewsData.length;
-    const totalPages = Math.ceil(totalResults / pageSize);
+export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
+    const apiKey = process.env.NEWSDATA_API_KEY;
+    if (!apiKey) {
+        console.error("News API key is not configured in .env file.");
+        return { results: [], nextPage: null, totalResults: 0 };
+    }
 
-    const startIndex = (pageNum - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const results = mockNewsData.slice(startIndex, endIndex);
+    const params = new URLSearchParams({
+        q: 'BMKG',
+        country: 'id',
+        language: 'id',
+        timezone: 'Asia/Jakarta',
+        apikey: apiKey,
+    });
 
-    const nextPage = pageNum < totalPages ? (pageNum + 1).toString() : null;
+    if (page) {
+        params.append('page', page);
+    }
     
-    return {
-        results,
-        nextPage,
-        totalResults,
-    };
+    const url = `https://newsdata.io/api/1/news?${params.toString()}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error("News API request failed with status:", response.status);
+            const errorBody = await response.text();
+            console.error("Error body:", errorBody);
+            throw new Error(`Gagal mengambil data berita: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        const articles: NewsArticle[] = data.results.map(mapApiArticleToNewsArticle);
+
+        return {
+            results: articles,
+            nextPage: data.nextPage,
+            totalResults: data.totalResults,
+        };
+    } catch (error) {
+        console.error("Error fetching news data:", error);
+        return { results: [], nextPage: null, totalResults: 0 };
+    }
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    return mockNewsData.find(article => article.id === id);
+    // newsdata.io doesn't have a lookup by ID endpoint, so we fetch the list and find it.
+    // This is not ideal for performance but necessary with this API.
+    const newsResponse = await getNewsData();
+    return newsResponse.results.find(article => article.id === id);
 };

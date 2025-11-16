@@ -101,7 +101,8 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
     const apiKey = process.env.NEWSDATA_API_KEY;
     if (!apiKey) {
-        throw new Error('News API key not configured.');
+        console.error("News API key is not configured in .env file.");
+        return undefined;
     }
 
     // The API doesn't support fetching by ID directly.
@@ -109,12 +110,16 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
     // This is not ideal for performance but necessary with this API's limitations.
     const query = 'Bmkg';
     const language = 'id';
+    // Remove page parameter to search across all recent articles, not just a specific page.
     const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${query}&language=${language}`;
     
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Failed to fetch news to find article ID ${id}`);
+             console.error(`Failed to fetch news to find article ID ${id}. Status: ${response.status}`);
+             const errorBody = await response.text();
+             console.error("Error body:", errorBody);
+             return undefined;
         }
         const data = await response.json();
         const article = (data.results || []).find((a: any) => a.article_id === id);
@@ -122,6 +127,10 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
         if (article) {
             return mapApiArticleToNewsArticle(article);
         }
+
+        // If not found, it might be on another page, but fetching all pages is inefficient.
+        // For this app's scope, searching the first page is a reasonable compromise.
+        console.warn(`Article with ID ${id} not found on the first page of results.`);
         return undefined;
     } catch (error) {
         console.error(`Error fetching article by ID ${id}:`, error);

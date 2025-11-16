@@ -76,8 +76,8 @@ export default async function EarthquakesPage() {
                                 <TableRow>
                                     <TableHead>Waktu</TableHead>
                                     <TableHead>Magnitudo</TableHead>
-                                    <TableHead>Kedalaman</TableHead>
-                                    <TableHead className="hidden md:table-cell">Lokasi</TableHead>
+                                    <TableHead className="hidden md:table-cell">Kedalaman</TableHead>
+                                    <TableHead>Lokasi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -89,8 +89,8 @@ export default async function EarthquakesPage() {
                                                 {eq.magnitude}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>{eq.depth}</TableCell>
-                                        <TableCell className="hidden md:table-cell">{eq.location}</TableCell>
+                                        <TableCell className="hidden md:table-cell">{eq.depth}</TableCell>
+                                        <TableCell>{eq.location}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

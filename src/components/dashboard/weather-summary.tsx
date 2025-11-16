@@ -7,6 +7,7 @@ import { localizeWeatherDescriptions } from '@/ai/flows/localize-weather-descrip
 import { useState, useEffect } from 'react';
 import React from "react";
 import Link from "next/link";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const iconComponents = {
     Sun,
@@ -86,15 +87,18 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                     </div>
                     <div>
                         <h4 className="text-sm font-medium mb-2 text-center text-muted-foreground">Prakiraan Per Jam</h4>
-                        <div className="flex justify-between bg-muted/50 p-2 rounded-md">
-                            {initialData.hourly.slice(0, 6).map((hour, index) => (
-                                <div key={index} className="flex flex-col items-center gap-1 p-1 w-[50px]">
-                                    <span className="text-xs text-muted-foreground">{hour.time}</span>
-                                    <WeatherIcon name={hour.icon} className="h-6 w-6 text-primary" />
-                                    <span className="font-semibold text-sm">{hour.temp}°</span>
-                                </div>
-                            ))}
-                        </div>
+                         <ScrollArea className="w-full whitespace-nowrap rounded-md">
+                            <div className="flex w-max space-x-2 bg-muted/50 p-2 rounded-md">
+                                {initialData.hourly.slice(0, 6).map((hour, index) => (
+                                    <div key={index} className="flex flex-col items-center gap-1 p-1 w-[50px]">
+                                        <span className="text-xs text-muted-foreground">{hour.time}</span>
+                                        <WeatherIcon name={hour.icon} className="h-6 w-6 text-primary" />
+                                        <span className="font-semibold text-sm">{hour.temp}°</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
                     </div>
                 </CardContent>
             </div>

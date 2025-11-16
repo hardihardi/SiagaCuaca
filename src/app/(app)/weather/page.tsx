@@ -7,9 +7,9 @@ import { getWeatherData } from '@/lib/data';
 import type { WeatherData } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Droplets, Wind, Umbrella, Sun, Cloud, CloudRain, Zap, Calendar, Clock } from "lucide-react";
+import { Droplets, Wind, Umbrella, Sun, Cloud, CloudRain, Zap, Calendar, Clock, Thermometer, TrendingUp } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, ResponsiveContainer } from "recharts";
 
 const iconComponents = {
     Sun,
@@ -47,10 +47,18 @@ export default function WeatherPage() {
     fetchData();
   }, [location]);
 
-  const chartData = useMemo(() => {
+  const hourlyChartData = useMemo(() => {
     return weatherData?.hourly.map(hour => ({
       time: hour.time,
-      temp: hour.temp
+      Suhu: hour.temp
+    })) || [];
+  }, [weatherData]);
+
+  const dailyChartData = useMemo(() => {
+    return weatherData?.daily.map(day => ({
+        name: day.day.slice(0, 3),
+        Suhu: day.temp,
+        "Curah Hujan": day.rainFall,
     })) || [];
   }, [weatherData]);
 
@@ -110,7 +118,7 @@ export default function WeatherPage() {
             </CardHeader>
             <CardContent className="pl-2">
                  <ChartContainer config={{}} className="h-80 w-full">
-                    <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
+                    <BarChart accessibilityLayer data={hourlyChartData} margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="time"
@@ -130,16 +138,34 @@ export default function WeatherPage() {
                             cursor={false}
                             content={<ChartTooltipContent 
                                 formatter={(value) => `${value}°C`}
-                                nameKey="time"
-                                labelKey="temp"
                             />}
                         />
-                        <Bar dataKey="temp" fill="hsl(var(--primary))" radius={4} />
+                        <Bar dataKey="Suhu" fill="hsl(var(--primary))" radius={4} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>
         </Card>
       </div>
+
+       <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5"/> Grafik Prakiraan 7 Hari</CardTitle>
+          <CardDescription>Grafik tren suhu dan curah hujan untuk seminggu ke depan.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={{}} className="h-80 w-full">
+            <LineChart data={dailyChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false}/>
+              <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis yAxisId="left" unit="°C" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis yAxisId="right" orientation="right" unit="mm" fontSize={12} tickLine={false} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line yAxisId="left" type="monotone" dataKey="Suhu" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+              <Line yAxisId="right" type="monotone" dataKey="Curah Hujan" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -155,7 +181,8 @@ export default function WeatherPage() {
                     <WeatherIcon name={day.icon} className="h-6 w-6" />
                     <span className="w-28 hidden sm:inline">{day.condition}</span>
                 </div>
-                <p className="font-semibold w-16 text-right">{day.temp}°C</p>
+                <p className="font-semibold w-20 text-right">{day.temp}°C</p>
+                <p className="font-semibold w-20 text-right text-accent">{day.rainFall} mm</p>
               </div>
             ))}
           </div>

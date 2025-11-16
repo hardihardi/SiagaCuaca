@@ -4,14 +4,15 @@ import { id } from 'date-fns/locale';
 
 // Mock data for weather, earthquake, and alerts
 export const getWeatherData = async (location: string) => {
+  const isRaining = Math.random() > 0.5;
   return {
-    location: "Jakarta, ID",
-    temperature: 32,
-    condition: "Cerah Berawan",
-    conditionIcon: "Cloud" as const,
-    humidity: 75,
-    windSpeed: 10,
-    rainFall: 0.2,
+    location: `${location}, ID`,
+    temperature: 28 + Math.floor(Math.random() * 5),
+    condition: isRaining ? "Hujan Ringan" : "Cerah Berawan",
+    conditionIcon: isRaining ? "CloudRain" : "Cloud" as const,
+    humidity: 70 + Math.floor(Math.random() * 15),
+    windSpeed: 8 + Math.floor(Math.random() * 5),
+    rainFall: parseFloat((Math.random() * 5).toFixed(1)),
     hourly: [
       { time: "13:00", temp: 32, icon: "Cloud" as const },
       { time: "14:00", temp: 33, icon: "Sun" as const },
@@ -21,13 +22,13 @@ export const getWeatherData = async (location: string) => {
       { time: "18:00", temp: 29, icon: "CloudRain" as const },
     ],
     daily: [
-        { day: "Senin", temp: 31, icon: "Cloud" as const, condition: "Berawan" },
-        { day: "Selasa", temp: 32, icon: "Sun" as const, condition: "Cerah" },
-        { day: "Rabu", temp: 29, icon: "CloudRain" as const, condition: "Hujan Ringan" },
-        { day: "Kamis", temp: 30, icon: "Zap" as const, condition: "Hujan Petir" },
-        { day: "Jumat", temp: 32, icon: "Sun" as const, condition: "Cerah" },
-        { day: "Sabtu", temp: 31, icon: "Cloud" as const, condition: "Berawan" },
-        { day: "Minggu", temp: 30, icon: "CloudRain" as const, condition: "Hujan Ringan" },
+        { day: "Senin", temp: 31, icon: "Cloud" as const, condition: "Berawan", rainFall: 0.5 },
+        { day: "Selasa", temp: 32, icon: "Sun" as const, condition: "Cerah", rainFall: 0.1 },
+        { day: "Rabu", temp: 29, icon: "CloudRain" as const, condition: "Hujan Ringan", rainFall: 3.2 },
+        { day: "Kamis", temp: 30, icon: "Zap" as const, condition: "Hujan Petir", rainFall: 5.5 },
+        { day: "Jumat", temp: 32, icon: "Sun" as const, condition: "Cerah", rainFall: 0.0 },
+        { day: "Sabtu", temp: 31, icon: "Cloud" as const, condition: "Berawan", rainFall: 1.0 },
+        { day: "Minggu", temp: 30, icon: "CloudRain" as const, condition: "Hujan Ringan", rainFall: 2.5 },
     ]
   };
 };
@@ -50,7 +51,7 @@ export const getAlertsData = async () => {
 
 // Fetches real news data from newsdata.io API with pagination
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
-  const apiKey = 'pub_066ffdf224864fe188a72234ee07c9bf';
+  const apiKey = 'pub_49869150034a70653d9e8027e1a3b3e6e872e';
   let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=BMKG&language=id`;
   if (page) {
     url += `&page=${page}`;

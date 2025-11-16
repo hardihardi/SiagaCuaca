@@ -175,13 +175,15 @@ export default function WeatherPage() {
         <CardContent>
           <div className="divide-y divide-border -mx-6 text-sm sm:text-base">
             {weatherData.daily.map(day => (
-              <div key={day.day} className="grid grid-cols-3 sm:grid-cols-4 items-center gap-2 py-3 px-6 hover:bg-muted/50 transition-colors">
-                <p className="font-medium col-span-1">{day.day}</p>
-                <div className="flex items-center gap-2 text-muted-foreground justify-start sm:justify-center col-span-1">
-                    <WeatherIcon name={day.icon} className="h-6 w-6" />
-                    <span className="hidden sm:inline">{day.condition}</span>
+              <div key={day.day} className="flex items-center justify-between gap-4 py-3 px-6 hover:bg-muted/50 transition-colors">
+                <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{day.day}</p>
                 </div>
-                <div className="col-span-1 grid grid-cols-2 text-right gap-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                    <WeatherIcon name={day.icon} className="h-6 w-6" />
+                    <span className="hidden sm:inline w-24">{day.condition}</span>
+                </div>
+                <div className="flex-none grid grid-cols-2 text-right gap-4 w-28">
                     <p className="font-semibold text-foreground">{day.temp}°C</p>
                     <p className="font-semibold text-accent">{day.rainFall} mm</p>
                 </div>

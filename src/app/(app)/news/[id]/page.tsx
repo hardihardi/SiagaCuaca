@@ -84,17 +84,6 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Konten Berita</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground whitespace-pre-line">
-                        {article.content || "Konten lengkap tidak tersedia."}
-                    </p>
-                </CardContent>
-            </Card>
-
             {article.link && (
                 <div className="flex justify-end">
                     <Button asChild variant="secondary">

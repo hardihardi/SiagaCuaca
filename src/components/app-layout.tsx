@@ -20,8 +20,6 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
-  SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth, useUser } from "@/firebase";
@@ -49,22 +47,27 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   const auth = useAuth();
   const { user } = useUser();
+  const [sheetOpen, setSheetOpen] = React.useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
+  
+  const handleLinkClick = () => {
+    setSheetOpen(false);
+  }
 
-  const NavContent = ({ onLinkClick }: { onLinkClick?: () => void }) => (
-    <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+  const NavContent = () => (
+    <nav className="grid items-start px-4 text-sm font-medium">
       {navItems.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}
-          onClick={onLinkClick}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
+          onClick={handleLinkClick}
+          className={`flex items-center gap-3 rounded-lg px-3 py-3 transition-all hover:bg-muted ${
             pathname === href
-              ? "bg-muted text-primary"
-              : "text-muted-foreground"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <Icon className="h-4 w-4" />
@@ -75,13 +78,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+    <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr]">
       <div className="hidden border-r bg-card md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
+          <div className="flex h-16 items-center border-b px-6">
+            <Link href="/" className="flex items-center gap-2 font-bold text-primary text-lg">
               <Cloud className="h-6 w-6" />
-              <span className="">IndoWeatherAlert</span>
+              <span>IndoWeatherAlert</span>
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-4">
@@ -90,8 +93,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       <div className="flex flex-col">
-        <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
-          <Sheet>
+        <header className="flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0 md:hidden">
                 <Menu className="h-5 w-5" />
@@ -99,12 +102,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0">
-                <SheetTitle className="sr-only">Menu</SheetTitle>
-                <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
-                <div className="flex h-14 items-center border-b px-4">
-                    <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
+                <div className="flex h-16 items-center border-b px-6">
+                    <Link href="/" className="flex items-center gap-2 font-bold text-primary text-lg">
                         <Cloud className="h-6 w-6" />
-                        <span className="">IndoWeatherAlert</span>
+                        <span>IndoWeatherAlert</span>
                     </Link>
                 </div>
                 <div className="mt-4 flex-1">
@@ -149,7 +150,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </DropdownMenu>
 
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-background">
           {children}
         </main>
       </div>

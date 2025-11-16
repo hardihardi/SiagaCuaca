@@ -80,30 +80,30 @@ export default function WeatherPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:space-y-8">
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">Prakiraan Cuaca Rinci</h1>
         <p className="text-muted-foreground">Data cuaca lengkap untuk {weatherData.location}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-1 flex flex-col items-center justify-center text-center">
-          <CardHeader>
-            <WeatherIcon name={weatherData.conditionIcon} className="h-20 w-20 text-primary mx-auto" />
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
+        <Card className="lg:col-span-1 flex flex-col items-center justify-center text-center p-6">
+          <CardHeader className="p-0">
+            <WeatherIcon name={weatherData.conditionIcon} className="h-24 w-24 text-primary mx-auto" />
           </CardHeader>
-          <CardContent>
-            <p className="text-6xl font-bold">{weatherData.temperature}°C</p>
-            <p className="text-lg text-muted-foreground">{weatherData.condition}</p>
+          <CardContent className="p-0 mt-4">
+            <p className="text-7xl font-bold">{weatherData.temperature}°C</p>
+            <p className="text-xl text-muted-foreground mt-1">{weatherData.condition}</p>
             <div className="mt-6 grid grid-cols-3 gap-4 text-sm">
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1.5">
                     <Droplets className="h-5 w-5 text-muted-foreground" />
                     <span>{weatherData.humidity}%</span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1.5">
                     <Wind className="h-5 w-5 text-muted-foreground" />
                     <span>{weatherData.windSpeed} km/j</span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1.5">
                     <Umbrella className="h-5 w-5 text-muted-foreground" />
                     <span>{weatherData.rainFall} mm</span>
                 </div>
@@ -173,10 +173,10 @@ export default function WeatherPage() {
           <CardDescription>Prakiraan cuaca untuk seminggu ke depan.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border -mx-6">
             {weatherData.daily.map(day => (
-              <div key={day.day} className="flex items-center justify-between py-3 px-2 -mx-2 hover:bg-muted/50 rounded-md transition-colors">
-                <p className="font-medium w-20 sm:w-24 flex-shrink-0">{day.day}</p>
+              <div key={day.day} className="flex items-center justify-between py-3 px-6 hover:bg-muted/50 transition-colors">
+                <p className="font-medium w-24 flex-shrink-0">{day.day}</p>
                 <div className="flex-1 flex items-center gap-2 text-muted-foreground justify-center">
                     <WeatherIcon name={day.icon} className="h-6 w-6" />
                     <span className="w-28 hidden sm:inline">{day.condition}</span>

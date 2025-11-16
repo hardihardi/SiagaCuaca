@@ -118,14 +118,18 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:space-y-8">
       <LocationHandler onLocationChange={handleLocationChange} />
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {loading.weather || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
-        {loading.static || !earthquakeData ? <SummarySkeleton /> : <EarthquakeSection initialData={earthquakeData} />}
-        {loading.static || !alertsData ? <AlertsSkeleton /> : <AlertsSection initialData={alertsData} />}
+      <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
+        <div className="lg:col-span-2 grid gap-6 md:gap-8">
+          {loading.weather || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
+        </div>
+        <div className="space-y-6 md:space-y-8">
+          {loading.static || !earthquakeData ? <SummarySkeleton /> : <EarthquakeSection initialData={earthquakeData} />}
+          {loading.static || !alertsData ? <AlertsSkeleton /> : <AlertsSection initialData={alertsData} />}
+        </div>
       </div>
-      <div className="grid gap-6">
+      <div className="grid gap-6 md:gap-8">
         {loading.static || !newsData ? <NewsSkeleton /> : <NewsSection initialData={newsData} />}
       </div>
     </div>

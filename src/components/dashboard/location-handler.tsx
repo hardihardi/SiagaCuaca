@@ -45,14 +45,14 @@ export default function LocationHandler({ onLocationChange }: { onLocationChange
       (position) => {
         // In a real app, you'd use position.coords.latitude and position.coords.longitude
         // to get the city name via a reverse geocoding API.
-        // For this mock, we'll just use a default location and show a success toast.
-        const mockLocation = "Bandung";
-        setSearchQuery(mockLocation);
-        onLocationChange(mockLocation);
-        router.push(`/?location=${mockLocation}`);
+        // For this demo, we'll use the coordinates and still fetch mock data.
+        const locationString = `${position.coords.latitude.toFixed(2)}, ${position.coords.longitude.toFixed(2)}`;
+        setSearchQuery(locationString);
+        onLocationChange(locationString);
+        router.push(`/?location=${locationString}`);
         toast({
           title: "Lokasi ditemukan",
-          description: `Menampilkan cuaca untuk ${mockLocation}.`,
+          description: `Menampilkan cuaca untuk lokasi Anda di ${locationString}.`,
         });
         setLoading(false);
       },

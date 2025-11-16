@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { LifeBuoy, BookCopy, ShieldQuestion } from "lucide-react";
+import { LifeBuoy, BookCopy, ShieldAlert, Phone, HeartPulse, Flame, Siren } from "lucide-react";
 
 const preparednessGuide = [
     {
@@ -52,7 +52,16 @@ const glossaryTerms = [
         term: "El Niño & La Niña",
         definition: "Fenomena iklim global yang terjadi di Samudra Pasifik. El Niño biasanya menyebabkan musim kemarau yang lebih kering di Indonesia, sementara La Niña menyebabkan musim hujan yang lebih basah."
     }
-]
+];
+
+const emergencyContacts = [
+    { name: "Ambulans", number: "118 / 119", icon: HeartPulse },
+    { name: "Pemadam Kebakaran", number: "113", icon: Flame },
+    { name: "Polisi", number: "110", icon: Siren },
+    { name: "BNPB (Badan Nasional Penanggulangan Bencana)", number: "117", icon: ShieldAlert },
+    { name: "BASARNAS (Badan Nasional Pencarian dan Pertolongan)", number: "115", icon: LifeBuoy }
+];
+
 
 export default function EducationPage() {
   return (
@@ -110,6 +119,30 @@ export default function EducationPage() {
             ))}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <Phone className="text-destructive"/>
+                Kontak Darurat Penting
+            </CardTitle>
+            <CardDescription>Nomor yang dapat dihubungi dalam keadaan darurat.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {emergencyContacts.map((contact, index) => (
+                <div key={index} className="flex items-center gap-4 p-4 border rounded-lg bg-background hover:bg-muted transition-colors">
+                    <div className="bg-destructive/10 p-3 rounded-full">
+                       <contact.icon className="h-6 w-6 text-destructive" />
+                    </div>
+                    <div>
+                        <h4 className="font-semibold text-foreground">{contact.name}</h4>
+                        <a href={`tel:${contact.number}`} className="text-lg font-bold text-destructive hover:underline">{contact.number}</a>
+                    </div>
+                </div>
+            ))}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

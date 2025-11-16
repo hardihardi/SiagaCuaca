@@ -76,8 +76,9 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
         apikey: apiKey,
     });
 
-    // We remove the page parameter to always fetch the first page.
-    // This simplifies the logic and fixes the 404 error.
+    if (page) {
+        params.set('page', page);
+    }
     
     const url = `https://newsdata.io/api/1/news?${params.toString()}`;
 

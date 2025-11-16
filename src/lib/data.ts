@@ -1,4 +1,4 @@
-import type { WeatherData, EarthquakeData, AlertData } from '@/lib/types';
+import type { WeatherData, EarthquakeData, AlertData, NewsArticle } from '@/lib/types';
 
 export const getWeatherData = async (location: string): Promise<WeatherData> => {
   // Mock data, in a real app this would fetch from BMKG API
@@ -45,5 +45,15 @@ export const getAlertsData = async (): Promise<AlertData[]> => {
     return [
         { id: "1", title: "Peringatan Hujan Lebat", area: "Jabodetabek", time: "15:00 - 18:00 WIB", details: "Potensi hujan lebat disertai kilat/petir dan angin kencang di wilayah Jakarta Selatan, Jakarta Timur, Depok, dan Bogor." },
         { id: "2", title: "Peringatan Gelombang Tinggi", area: "Selat Sunda", time: "Hingga 2024-08-06 07:00 WIB", details: "Tinggi gelombang mencapai 2.5 - 4.0 meter di Selat Sunda bagian selatan. Harap waspada." },
+    ]
+}
+
+export const getNewsData = async (): Promise<NewsArticle[]> => {
+    // Mock data
+    return [
+        { id: "1", title: "Memahami Skala Magnitudo Gempa Bumi dan Dampaknya", category: "Edukasi", date: "5 Agu 2024", imageUrl: "https://picsum.photos/seed/news1/600/400", imageHint: "earthquake infographic", source: "BMKG" },
+        { id: "2", title: "Musim Kemarau 2024: BMKG Prediksi Puncak Terjadi di Agustus", category: "Iklim", date: "4 Agu 2024", imageUrl: "https://picsum.photos/seed/news2/600/400", imageHint: "dry season", source: "Info Iklim" },
+        { id: "3", title: "Teknologi Modifikasi Cuaca untuk Atasi Kekeringan", category: "Teknologi", date: "3 Agu 2024", imageUrl: "https://picsum.photos/seed/news3/600/400", imageHint: "cloud seeding", source: "Info Cuaca" },
+        { id: "4", title: "Kenali Jenis-jenis Awan dan Potensi Cuaca yang Dibawa", category: "Cuaca", date: "2 Agu 2024", imageUrl: "https://picsum.photos/seed/news4/600/400", imageHint: "cumulonimbus cloud", source: "BMKG" },
     ]
 }

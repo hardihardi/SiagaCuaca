@@ -30,3 +30,13 @@ export interface AlertData {
   time: string;
   details: string;
 }
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  imageUrl: string;
+  imageHint: string;
+  source: string;
+}

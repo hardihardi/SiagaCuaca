@@ -11,6 +11,7 @@ import {
   Menu,
   Sun,
   Moon,
+  Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/weather", label: "Cuaca", icon: Cloud },
   { href: "/earthquakes", label: "Gempa Bumi", icon: Activity },
   { href: "/alerts", label: "Peringatan Dini", icon: AlertTriangle },
+  { href: "/news", label: "Berita", icon: Newspaper },
   { href: "/settings", label: "Pengaturan", icon: Settings },
 ];
 

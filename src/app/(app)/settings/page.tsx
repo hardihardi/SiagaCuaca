@@ -1,30 +1,104 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { BellRing } from "lucide-react";
+import { BellRing, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
+  
   const [earthquakeNotif, setEarthquakeNotif] = useState(false);
   const [weatherAlertNotif, setWeatherAlertNotif] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveChanges = () => {
-    // In a real app, you would save these settings to a backend or localStorage.
-    console.log({
-      earthquakeNotif,
-      weatherAlertNotif
-    });
-    toast({
-      title: "Pengaturan Disimpan",
-      description: "Preferensi notifikasi Anda telah diperbarui.",
-    });
+  const userDocRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!userDocRef) return;
+      setIsLoading(true);
+      try {
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setEarthquakeNotif(data.earthquakeNotif ?? false);
+          setWeatherAlertNotif(data.weatherAlertNotif ?? true);
+        }
+      } catch (error) {
+        console.error("Error fetching user settings:", error);
+        toast({
+          variant: "destructive",
+          title: "Gagal memuat pengaturan",
+          description: "Terjadi kesalahan saat mengambil data pengaturan Anda.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, [userDocRef, toast]);
+
+
+  const handleSaveChanges = async () => {
+    if (!userDocRef) return;
+    setIsSaving(true);
+    try {
+      await setDoc(userDocRef, { 
+        earthquakeNotif, 
+        weatherAlertNotif 
+      }, { merge: true });
+
+      toast({
+        title: "Pengaturan Disimpan",
+        description: "Preferensi notifikasi Anda telah diperbarui.",
+      });
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast({
+        variant: "destructive",
+        title: "Gagal menyimpan",
+        description: "Terjadi kesalahan saat menyimpan pengaturan Anda.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 max-w-3xl">
+        <div className="space-y-1">
+          <Skeleton className="h-9 w-48" />
+          <Skeleton className="h-5 w-72" />
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-4 w-full max-w-lg" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </CardContent>
+        </Card>
+        <Skeleton className="h-10 w-36" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -53,6 +127,7 @@ export default function SettingsPage() {
                   aria-label="Notifikasi Gempa Bumi"
                   checked={earthquakeNotif}
                   onCheckedChange={setEarthquakeNotif}
+                  disabled={isSaving}
                 />
             </div>
              <div className="flex items-center justify-between rounded-lg border p-4">
@@ -70,12 +145,16 @@ export default function SettingsPage() {
                   aria-label="Notifikasi Peringatan Cuaca"
                   checked={weatherAlertNotif}
                   onCheckedChange={setWeatherAlertNotif}
+                  disabled={isSaving}
                 />
             </div>
         </CardContent>
       </Card>
       <div className="flex justify-start">
-        <Button onClick={handleSaveChanges}>Simpan Perubahan</Button>
+        <Button onClick={handleSaveChanges} disabled={isSaving}>
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
+        </Button>
       </div>
     </div>
   );

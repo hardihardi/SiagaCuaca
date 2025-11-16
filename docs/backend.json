@@ -27,6 +27,14 @@
         "defaultLocation": {
           "type": "string",
           "description": "The default location (e.g., city/province code) set by the user for weather forecasts. Reference to Location entity."
+        },
+        "earthquakeNotif": {
+            "type": "boolean",
+            "description": "User preference for receiving earthquake notifications."
+        },
+        "weatherAlertNotif": {
+            "type": "boolean",
+            "description": "User preference for receiving weather alert notifications."
         }
       },
       "required": [

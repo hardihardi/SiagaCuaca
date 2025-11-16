@@ -55,13 +55,35 @@ service cloud.firestore {
 
       // isExistingOwner() checks that the userId matches the authenticated user's UID, and that the resource exists.
       function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
+        return isOwner(userId) && exists(/databases/$(database)/documents/users/$(userId));
       }
 
+      // newUserDataIsValid() checks that the created data has the required fields
+      function newUserDataIsValid() {
+        let data = request.resource.data;
+        return data.id == request.auth.uid &&
+               data.createdAt is timestamp &&
+               data.updatedAt is timestamp &&
+               (!('defaultLocation' in data) || data.defaultLocation is string) &&
+               (!('earthquakeNotif' in data) || data.earthquakeNotif is bool) &&
+               (!('weatherAlertNotif' in data) || data.weatherAlertNotif is bool);
+      }
+      
+      // updatedUserDataIsValid() checks that the updated data does not change immutable fields
+       function updatedUserDataIsValid() {
+        let data = request.resource.data;
+        return data.id == resource.data.id &&
+               data.createdAt == resource.data.createdAt &&
+               data.updatedAt is timestamp && data.updatedAt > resource.data.updatedAt &&
+               (!('defaultLocation' in data) || data.defaultLocation is string) &&
+               (!('earthquakeNotif' in data) || data.earthquakeNotif is bool) &&
+               (!('weatherAlertNotif' in data) || data.weatherAlertNotif is bool);
+      }
+      
       allow get: if isOwner(userId);
       allow list: if false; // Listing users is not permitted.
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow create: if isOwner(userId) && newUserDataIsValid();
+      allow update: if isExistingOwner(userId) && updatedUserDataIsValid();
       allow delete: if isExistingOwner(userId);
     }
 

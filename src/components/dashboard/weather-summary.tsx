@@ -29,6 +29,10 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
 
     useEffect(() => {
         const fetchLocalizedDescription = async () => {
+            if (!initialData.location || !initialData.condition) {
+                setLocalizedDescription(initialData.condition);
+                return;
+            }
             try {
                 const result = await localizeWeatherDescriptions({
                     location: initialData.location,
@@ -36,16 +40,12 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                 });
                 setLocalizedDescription(result.localizedDescription);
             } catch (error) {
-                console.error("Failed to localize weather description:", error);
+                console.error("Failed to localize weather description, falling back to original:", error);
                 setLocalizedDescription(initialData.condition);
             }
         };
 
-        if (initialData.location && initialData.condition) {
-            fetchLocalizedDescription();
-        } else {
-            setLocalizedDescription(initialData.condition);
-        }
+        fetchLocalizedDescription();
     }, [initialData]);
 
   return (

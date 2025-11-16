@@ -94,7 +94,7 @@ export default function LocationHandler({ onLocationChange }: { onLocationChange
         </div>
         <Button variant="secondary" onClick={handleGeolocation} disabled={loading} className="w-full sm:w-auto">
           <MapPin className="mr-2 h-4 w-4" />
-          {loading ? "Mencari..." : "Gunakan Lokasi Saya Secara Akurat"}
+          {loading ? "Mencari..." : "Lokasi Saya"}
         </Button>
       </div>
     </Card>

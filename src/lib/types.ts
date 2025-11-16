@@ -1,15 +1,17 @@
 import type { LucideIcon } from "lucide-react";
 
+type IconName = "Sun" | "Cloud" | "CloudRain" | "Zap";
+
 export interface WeatherData {
   location: string;
   temperature: number;
   condition: string;
-  conditionIcon: LucideIcon;
+  conditionIcon: IconName;
   humidity: number;
   windSpeed: number;
   rainFall: number;
-  hourly: { time: string; temp: number; icon: LucideIcon }[];
-  daily: { day: string; temp: number; icon: LucideIcon }[];
+  hourly: { time: string; temp: number; icon: IconName }[];
+  daily: { day: string; temp: number; icon: IconName }[];
 }
 
 export interface EarthquakeData {

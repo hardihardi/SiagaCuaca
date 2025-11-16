@@ -1,5 +1,4 @@
 import type { WeatherData, EarthquakeData, AlertData } from '@/lib/types';
-import { Sun, Cloud, CloudRain, Zap } from 'lucide-react';
 
 export const getWeatherData = async (location: string): Promise<WeatherData> => {
   // Mock data, in a real app this would fetch from BMKG API
@@ -7,26 +6,26 @@ export const getWeatherData = async (location: string): Promise<WeatherData> => 
     location: "Jakarta, ID",
     temperature: 32,
     condition: "Cerah Berawan",
-    conditionIcon: Cloud,
+    conditionIcon: "Cloud",
     humidity: 75,
     windSpeed: 10,
     rainFall: 0.2,
     hourly: [
-      { time: "13:00", temp: 32, icon: Cloud },
-      { time: "14:00", temp: 33, icon: Sun },
-      { time: "15:00", temp: 32, icon: Sun },
-      { time: "16:00", temp: 31, icon: Cloud },
-      { time: "17:00", temp: 30, icon: CloudRain },
-      { time: "18:00", temp: 29, icon: CloudRain },
+      { time: "13:00", temp: 32, icon: "Cloud" },
+      { time: "14:00", temp: 33, icon: "Sun" },
+      { time: "15:00", temp: 32, icon: "Sun" },
+      { time: "16:00", temp: 31, icon: "Cloud" },
+      { time: "17:00", temp: 30, icon: "CloudRain" },
+      { time: "18:00", temp: 29, icon: "CloudRain" },
     ],
     daily: [
-        { day: "Senin", temp: 31, icon: Cloud },
-        { day: "Selasa", temp: 32, icon: Sun },
-        { day: "Rabu", temp: 29, icon: CloudRain },
-        { day: "Kamis", temp: 30, icon: Zap },
-        { day: "Jumat", temp: 32, icon: Sun },
-        { day: "Sabtu", temp: 31, icon: Cloud },
-        { day: "Minggu", temp: 30, icon: CloudRain },
+        { day: "Senin", temp: 31, icon: "Cloud" },
+        { day: "Selasa", temp: 32, icon: "Sun" },
+        { day: "Rabu", temp: 29, icon: "CloudRain" },
+        { day: "Kamis", temp: 30, icon: "Zap" },
+        { day: "Jumat", temp: 32, icon: "Sun" },
+        { day: "Sabtu", temp: 31, icon: "Cloud" },
+        { day: "Minggu", temp: 30, icon: "CloudRain" },
     ]
   };
 };

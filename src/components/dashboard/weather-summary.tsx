@@ -1,9 +1,23 @@
 "use client";
 import type { WeatherData } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Droplets, Wind, Umbrella } from "lucide-react";
+import { Droplets, Wind, Umbrella, Sun, Cloud, CloudRain, Zap } from "lucide-react";
 import { localizeWeatherDescriptions } from '@/ai/flows/localize-weather-descriptions';
 import { useState, useEffect } from 'react';
+import React from "react";
+
+const iconComponents = {
+    Sun,
+    Cloud,
+    CloudRain,
+    Zap,
+};
+
+const WeatherIcon = ({ name, className }: { name: keyof typeof iconComponents; className?: string }) => {
+    const IconComponent = iconComponents[name];
+    return IconComponent ? <IconComponent className={className} /> : null;
+};
+
 
 export default function WeatherSummary({ initialData }: { initialData: WeatherData }) {
     const [localizedDescription, setLocalizedDescription] = useState(initialData.condition);
@@ -31,7 +45,7 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Cuaca Saat Ini</span>
-          <initialData.conditionIcon className="h-8 w-8 text-primary" />
+          <WeatherIcon name={initialData.conditionIcon} className="h-8 w-8 text-primary" />
         </CardTitle>
         <CardDescription>{initialData.location}</CardDescription>
       </CardHeader>
@@ -65,7 +79,7 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                 {initialData.hourly.slice(0, 6).map((hour, index) => (
                     <div key={index} className="flex flex-col items-center gap-1 p-1">
                         <span className="text-xs text-muted-foreground">{hour.time}</span>
-                        <hour.icon className="h-6 w-6 text-primary" />
+                        <WeatherIcon name={hour.icon} className="h-6 w-6 text-primary" />
                         <span className="font-semibold text-sm">{hour.temp}°</span>
                     </div>
                 ))}

@@ -1,3 +1,4 @@
+
 import type { NewsArticle, NewsApiResponse } from '@/lib/types';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -49,70 +50,47 @@ export const getAlertsData = async () => {
     ]
 }
 
-// Fetches real news data from newsdata.io API with pagination
+const mockNewsData: NewsArticle[] = [
+    {
+      id: 'news-1',
+      title: 'BMKG: Waspada Potensi Hujan Lebat di Sebagian Besar Wilayah Indonesia',
+      description: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) mengeluarkan peringatan dini mengenai potensi hujan lebat yang dapat disertai kilat/petir dan angin kencang di sebagian besar wilayah Indonesia dalam beberapa hari ke depan.',
+      content: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) meminta masyarakat untuk waspada terhadap potensi hujan dengan intensitas sedang hingga lebat yang dapat disertai kilat/petir dan angin kencang di sejumlah provinsi di Indonesia. Prakiraan ini berlaku untuk periode 6-8 Agustus 2024. Beberapa wilayah yang berpotensi mengalami cuaca signifikan antara lain Sumatera Barat, Riau, Jambi, Bengkulu, Sumatera Selatan, Lampung, sebagian besar Jawa, Kalimantan, Sulawesi, dan Papua. Kepala Pusat Meteorologi Publik BMKG, Andri Ramdhani, mengatakan bahwa kondisi ini dipicu oleh aktivitas gelombang atmosfer dan sirkulasi siklonik di sekitar wilayah Indonesia. "Kami mengimbau masyarakat untuk tetap waspada dan berhati-hati terhadap potensi dampak bencana hidrometeorologi seperti banjir, tanah longsor, dan pohon tumbang," ujarnya.',
+      category: 'Cuaca',
+      date: '5 Agu 2024',
+      imageUrl: 'https://picsum.photos/seed/news1/600/400',
+      imageHint: 'rainy weather',
+      source: 'BMKG',
+      link: 'https://www.bmkg.go.id'
+    },
+    {
+      id: 'news-2',
+      title: 'Gempa Magnitudo 5.2 Guncang Sukabumi, Tidak Berpotensi Tsunami',
+      description: 'Gempa bumi dengan magnitudo 5.2 mengguncang wilayah Sukabumi, Jawa Barat pada Senin (5/8) siang. BMKG menyatakan gempa ini tidak berpotensi tsunami.',
+      content: 'Gempa bumi tektonik mengguncang wilayah pesisir selatan Jawa Barat pada hari Senin, 5 Agustus 2024, pukul 14:35:10 WIB. Hasil analisis BMKG menunjukkan bahwa gempa ini memiliki parameter update dengan magnitudo M5.0. Episenter gempa terletak pada koordinat 7.99° LS dan 106.51° BT, atau tepatnya berlokasi di laut pada jarak 125 km arah Barat Daya dari Kabupaten Sukabumi, Jawa Barat pada kedalaman 10 km. Berdasarkan pemodelan, gempa ini tidak berpotensi menimbulkan tsunami. Guncangan dirasakan di beberapa daerah seperti Palabuhanratu, Cianjur, hingga sebagian wilayah Jakarta dengan intensitas yang berbeda. Warga diimbau untuk tetap tenang dan tidak terpengaruh oleh isu yang tidak dapat dipertanggungjawabkan kebenarannya.',
+      category: 'Gempa Bumi',
+      date: '5 Agu 2024',
+      imageUrl: 'https://picsum.photos/seed/news2/600/400',
+      imageHint: 'earthquake map',
+      source: 'Kompas',
+      link: '#'
+    },
+];
+
+// Reverted to mock data due to API key failure.
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
-  const apiKey = 'pub_49869150034a70653d9e8027e1a3b3e6e872e';
-  let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=BMKG&language=id`;
-  if (page) {
-    url += `&page=${page}`;
-  }
-
-  try {
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) {
-      console.error("Failed to fetch news:", response.statusText);
-      return { results: [], nextPage: null, totalResults: 0 };
-    }
-    const data = await response.json();
-    
-    const results: NewsArticle[] = data.results.map((article: any, index: number) => ({
-      id: article.article_id || `${page || '0'}_${index}`,
-      title: article.title,
-      description: article.description,
-      content: article.content,
-      category: article.category?.[0] || "Berita",
-      date: article.pubDate ? format(new Date(article.pubDate), "d MMM yyyy", { locale: id }) : "Tanggal tidak tersedia",
-      imageUrl: article.image_url || `https://picsum.photos/seed/news${index}/600/400`,
-      imageHint: article.keywords?.join(' ') || "berita cuaca",
-      source: article.source_id || "Sumber tidak diketahui",
-      link: article.link,
-    }));
-
-    return {
-        results,
-        nextPage: data.nextPage || null,
-        totalResults: data.totalResults || 0,
-    };
-
-  } catch (error) {
-    console.error("Error fetching or parsing news data:", error);
-    return { results: [], nextPage: null, totalResults: 0 };
-  }
+    console.log("Menggunakan data berita mock karena kegagalan API.");
+    // This mock implementation does not support pagination.
+    // It returns the same data regardless of the page parameter.
+    return Promise.resolve({
+        results: mockNewsData,
+        nextPage: null, // No next page for mock data
+        totalResults: mockNewsData.length,
+    });
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    // This function will now find the article from the fetched data.
-    // For simplicity in this context, we will fetch all and find,
-    // in a real-world scenario with a proper backend, you would fetch a single article by ID.
-    // This function might not work correctly with pagination as it only fetches the first page.
-    let allNews: NewsArticle[] = [];
-    let nextPage: string | null = null;
-    let pageFetched = false;
-
-    // A simple loop to fetch a few pages to find the article. This is not ideal for production.
-    for (let i = 0; i < 5; i++) {
-        const { results, nextPage: newNextPage } = await getNewsData(nextPage || undefined);
-        allNews = allNews.concat(results);
-        const found = allNews.find(article => article.id === id);
-        if (found) {
-            return found;
-        }
-        if (!newNextPage) {
-            break;
-        }
-        nextPage = newNextPage;
-    }
-    
-    // Fallback if not found in first few pages
+    // Finds the article from the mock data array.
+    const allNews = mockNewsData;
     return allNews.find(article => article.id === id);
 }

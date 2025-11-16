@@ -57,3 +57,8 @@ export const getNewsData = async (): Promise<NewsArticle[]> => {
         { id: "4", title: "Kenali Jenis-jenis Awan dan Potensi Cuaca yang Dibawa", category: "Cuaca", date: "2 Agu 2024", imageUrl: "https://picsum.photos/seed/news4/600/400", imageHint: "cumulonimbus cloud", source: "BMKG" },
     ]
 }
+
+export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
+    const articles = await getNewsData();
+    return articles.find(article => article.id === id);
+}

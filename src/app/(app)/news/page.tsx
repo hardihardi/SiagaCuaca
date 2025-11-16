@@ -22,7 +22,7 @@ export default async function NewsPage() {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {newsData.map((article: NewsArticle) => (
-          <Link key={article.id} href="#" className="group block">
+          <Link key={article.id} href={`/news/${article.id}`} className="group block">
             <Card className="overflow-hidden h-full transition-shadow hover:shadow-lg">
                 <div className="relative h-48 w-full">
                     <Image

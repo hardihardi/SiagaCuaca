@@ -20,7 +20,7 @@ export default function NewsSummary({ initialData }: { initialData: NewsArticle[
             <CardContent className="flex-1 space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
                     {featuredArticles.map(article => (
-                        <Link key={article.id} href="#" className="group block">
+                        <Link key={article.id} href={`/news/${article.id}`} className="group block">
                             <Card className="overflow-hidden h-full transition-shadow hover:shadow-lg">
                                 <div className="relative h-48 w-full">
                                     <Image

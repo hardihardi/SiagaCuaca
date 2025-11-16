@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { BellRing, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -49,33 +51,42 @@ export default function SettingsPage() {
       }
     };
 
-    fetchSettings();
-  }, [userDocRef, toast]);
+    if (user) {
+        fetchSettings();
+    } else if (!user && !isLoading) {
+        setIsLoading(false);
+    }
+  }, [user, userDocRef, toast, isLoading]);
 
 
   const handleSaveChanges = async () => {
     if (!userDocRef) return;
     setIsSaving(true);
-    try {
-      await setDoc(userDocRef, { 
-        earthquakeNotif, 
-        weatherAlertNotif 
-      }, { merge: true });
+    
+    const settingsData = { 
+      earthquakeNotif, 
+      weatherAlertNotif,
+      updatedAt: serverTimestamp()
+    };
 
-      toast({
-        title: "Pengaturan Disimpan",
-        description: "Preferensi notifikasi Anda telah diperbarui.",
+    setDoc(userDocRef, settingsData, { merge: true })
+      .then(() => {
+        toast({
+          title: "Pengaturan Disimpan",
+          description: "Preferensi notifikasi Anda telah diperbarui.",
+        });
+      })
+      .catch((error) => {
+        const contextualError = new FirestorePermissionError({
+            path: userDocRef.path,
+            operation: 'update',
+            requestResourceData: settingsData
+        });
+        errorEmitter.emit('permission-error', contextualError);
+      })
+      .finally(() => {
+        setIsSaving(false);
       });
-    } catch (error) {
-      console.error("Error saving settings:", error);
-      toast({
-        variant: "destructive",
-        title: "Gagal menyimpan",
-        description: "Terjadi kesalahan saat menyimpan pengaturan Anda.",
-      });
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   if (isLoading) {

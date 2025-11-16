@@ -1,39 +1,38 @@
-import type { WeatherData, EarthquakeData, AlertData, NewsArticle } from '@/lib/types';
+import type { NewsArticle } from '@/lib/types';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
-export const getWeatherData = async (location: string): Promise<WeatherData> => {
-  // Mock data, in a real app this would fetch from BMKG API
+// Mock data for weather, earthquake, and alerts
+export const getWeatherData = async (location: string) => {
   return {
     location: "Jakarta, ID",
     temperature: 32,
     condition: "Cerah Berawan",
-    conditionIcon: "Cloud",
+    conditionIcon: "Cloud" as const,
     humidity: 75,
     windSpeed: 10,
     rainFall: 0.2,
     hourly: [
-      { time: "13:00", temp: 32, icon: "Cloud" },
-      { time: "14:00", temp: 33, icon: "Sun" },
-      { time: "15:00", temp: 32, icon: "Sun" },
-      { time: "16:00", temp: 31, icon: "Cloud" },
-      { time: "17:00", temp: 30, icon: "CloudRain" },
-      { time: "18:00", temp: 29, icon: "CloudRain" },
+      { time: "13:00", temp: 32, icon: "Cloud" as const },
+      { time: "14:00", temp: 33, icon: "Sun" as const },
+      { time: "15:00", temp: 32, icon: "Sun" as const },
+      { time: "16:00", temp: 31, icon: "Cloud" as const },
+      { time: "17:00", temp: 30, icon: "CloudRain" as const },
+      { time: "18:00", temp: 29, icon: "CloudRain" as const },
     ],
     daily: [
-        { day: "Senin", temp: 31, icon: "Cloud", condition: "Berawan" },
-        { day: "Selasa", temp: 32, icon: "Sun", condition: "Cerah" },
-        { day: "Rabu", temp: 29, icon: "CloudRain", condition: "Hujan Ringan" },
-        { day: "Kamis", temp: 30, icon: "Zap", condition: "Hujan Petir" },
-        { day: "Jumat", temp: 32, icon: "Sun", condition: "Cerah" },
-        { day: "Sabtu", temp: 31, icon: "Cloud", condition: "Berawan" },
-        { day: "Minggu", temp: 30, icon: "CloudRain", condition: "Hujan Ringan" },
+        { day: "Senin", temp: 31, icon: "Cloud" as const, condition: "Berawan" },
+        { day: "Selasa", temp: 32, icon: "Sun" as const, condition: "Cerah" },
+        { day: "Rabu", temp: 29, icon: "CloudRain" as const, condition: "Hujan Ringan" },
+        { day: "Kamis", temp: 30, icon: "Zap" as const, condition: "Hujan Petir" },
+        { day: "Jumat", temp: 32, icon: "Sun" as const, condition: "Cerah" },
+        { day: "Sabtu", temp: 31, icon: "Cloud" as const, condition: "Berawan" },
+        { day: "Minggu", temp: 30, icon: "CloudRain" as const, condition: "Hujan Ringan" },
     ]
   };
 };
 
-export const getEarthquakeData = async (): Promise<EarthquakeData[]> => {
-    // Mock data, in a real app this would fetch and parse from BMKG
+export const getEarthquakeData = async () => {
     return [
         { id: "1", time: "2024-08-05 14:35:10 WIB", magnitude: 5.2, depth: "10 km", location: "125 km BaratDaya KAB-SUKABUMI-JABAR", coordinates: [-7.99, 106.51] },
         { id: "2", time: "2024-08-05 11:20:45 WIB", magnitude: 3.1, depth: "22 km", location: "30 km Tenggara KOTA-BOGOR-JABAR", coordinates: [-6.84, 106.94] },
@@ -42,14 +41,14 @@ export const getEarthquakeData = async (): Promise<EarthquakeData[]> => {
     ];
 }
 
-export const getAlertsData = async (): Promise<AlertData[]> => {
-    // Mock data, in a real app this would fetch from BMKG
+export const getAlertsData = async () => {
     return [
         { id: "1", title: "Peringatan Hujan Lebat", area: "Jabodetabek", time: "15:00 - 18:00 WIB", details: "Potensi hujan lebat disertai kilat/petir dan angin kencang di wilayah Jakarta Selatan, Jakarta Timur, Depok, dan Bogor." },
         { id: "2", title: "Peringatan Gelombang Tinggi", area: "Selat Sunda", time: "Hingga 2024-08-06 07:00 WIB", details: "Tinggi gelombang mencapai 2.5 - 4.0 meter di Selat Sunda bagian selatan. Harap waspada." },
     ]
 }
 
+// Fetches real news data from newsdata.io API
 export const getNewsData = async (): Promise<NewsArticle[]> => {
   const apiKey = 'pub_066ffdf224864fe188a72234ee07c9bf';
   const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=BMKG&language=id`;
@@ -64,6 +63,7 @@ export const getNewsData = async (): Promise<NewsArticle[]> => {
     return data.results.map((article: any, index: number) => ({
       id: article.article_id || `${index}`,
       title: article.title,
+      description: article.description,
       category: article.category?.[0] || "Berita",
       date: article.pubDate ? format(new Date(article.pubDate), "d MMM yyyy", { locale: id }) : "Tanggal tidak tersedia",
       imageUrl: article.image_url || `https://picsum.photos/seed/news${index}/600/400`,

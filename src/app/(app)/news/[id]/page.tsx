@@ -6,9 +6,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft, ExternalLink } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function NewsDetailPage({ params }: { params: { id: string } }) {
   const article = await getNewsArticleById(params.id);
@@ -60,14 +58,13 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
             </div>
 
             <Card>
-                <CardContent className="pt-6">
-                    <Alert>
-                        <Info className="h-4 w-4" />
-                        <AlertTitle>Konten Artikel</AlertTitle>
-                        <AlertDescription>
-                            Konten artikel lengkap tidak tersedia di aplikasi ini. Silakan kunjungi sumber asli untuk membaca lebih lanjut.
-                        </AlertDescription>
-                    </Alert>
+                <CardHeader>
+                    <CardTitle>Cuplikan Berita</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground">
+                        {article.description || "Cuplikan tidak tersedia."}
+                    </p>
                 </CardContent>
             </Card>
 

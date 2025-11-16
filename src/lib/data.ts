@@ -68,7 +68,7 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
         return { results: [], nextPage: null, totalResults: 0 };
     }
 
-    const query = 'Bmkg';
+    const query = 'BMKG';
     const language = 'id';
     let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${query}&language=${language}`;
     if (page) {
@@ -108,9 +108,8 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
     // The API doesn't support fetching by ID directly.
     // As a workaround, we fetch the latest news and find the article by ID.
     // This is not ideal for performance but necessary with this API's limitations.
-    const query = 'Bmkg';
+    const query = 'BMKG';
     const language = 'id';
-    // Remove page parameter to search across all recent articles, not just a specific page.
     const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${query}&language=${language}`;
     
     try {
@@ -128,8 +127,6 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
             return mapApiArticleToNewsArticle(article);
         }
 
-        // If not found, it might be on another page, but fetching all pages is inefficient.
-        // For this app's scope, searching the first page is a reasonable compromise.
         console.warn(`Article with ID ${id} not found on the first page of results.`);
         return undefined;
     } catch (error) {

@@ -18,6 +18,8 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetTitle,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { useTheme } from "@/components/theme-provider";
 
@@ -83,6 +85,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0">
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
                 <div className="flex h-14 items-center border-b px-4">
                     <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
                         <Cloud className="h-6 w-6" />

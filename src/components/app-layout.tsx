@@ -15,6 +15,7 @@ import {
   Newspaper,
   User as UserIcon,
   LogOut,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/earthquakes", label: "Gempa Bumi", icon: Activity },
   { href: "/alerts", label: "Peringatan Dini", icon: AlertTriangle },
   { href: "/news", label: "Berita", icon: Newspaper },
+  { href: "/education", label: "Edukasi", icon: BookOpen },
   { href: "/settings", label: "Pengaturan", icon: Settings },
 ];
 

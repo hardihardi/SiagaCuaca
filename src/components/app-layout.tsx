@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -139,9 +140,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>
-                <p>Akun Saya</p>
+                <p className="font-medium">{user?.displayName || user?.email}</p>
                 <p className="text-xs text-muted-foreground font-normal">
-                  {user?.isAnonymous ? "Pengguna Anonim" : user?.email}
+                  {user?.isAnonymous ? "Pengguna Anonim" : user?.displayName ? user?.email : ''}
                 </p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

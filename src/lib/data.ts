@@ -51,74 +51,32 @@ export const getAlertsData = async () => {
 }
 
 
-const API_KEY = process.env.NEWSDATA_API_KEY;
-const API_URL = `https://newsdata.io/api/1/latest?country=id&language=id&apikey=${API_KEY}`;
-
-const mapArticle = (article: any): NewsArticle => ({
-    id: article.article_id,
-    title: article.title,
-    description: article.description,
-    content: article.content,
-    category: article.category?.[0] || 'Umum',
-    date: article.pubDate ? format(new Date(article.pubDate), 'd LLL yyyy', { locale: id }) : 'Tanggal tidak diketahui',
-    imageUrl: article.image_url || `https://picsum.photos/seed/${article.article_id}/600/400`,
-    imageHint: 'abstract',
-    source: article.source_id || 'Tidak diketahui',
-    link: article.link,
-});
+const mockNewsData = [
+  { id: 'news-1', title: 'Musim Kemarau 2024 Diprediksi Lebih Basah dari Biasanya', description: 'BMKG memprediksi bahwa musim kemarau tahun ini akan diwarnai oleh hujan sporadis di beberapa wilayah Indonesia.', content: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) merilis prakiraan terbaru untuk musim kemarau 2024. Tidak seperti tahun-tahun sebelumnya, musim kemarau kali ini diprediksi akan lebih basah akibat pengaruh anomali iklim global. Fenomena ini dapat menyebabkan hujan dengan intensitas ringan hingga sedang terjadi secara sporadis, terutama di wilayah Indonesia bagian barat dan tengah. Petani diimbau untuk menyesuaikan jadwal tanam mereka.', category: 'Iklim', date: '2024-08-04', imageUrl: 'https://picsum.photos/seed/news1/600/400', imageHint: 'dry season', source: 'BMKG', link: '#' },
+  { id: 'news-2', title: 'Waspada Potensi Angin Kencang di Pesisir Selatan Jawa', description: 'Angin kencang dengan kecepatan mencapai 30 knot berpotensi terjadi di sepanjang pesisir selatan Jawa.', content: 'BMKG mengeluarkan peringatan dini terkait potensi angin kencang di wilayah pesisir selatan Jawa, mulai dari Banten hingga Jawa Timur. Kecepatan angin diperkirakan dapat mencapai 30 knot, yang berisiko bagi aktivitas pelayaran dan perikanan. Masyarakat diimbau untuk selalu waspada dan mengikuti informasi terbaru dari pihak berwenang.', category: 'Cuaca', date: '2024-08-03', imageUrl: 'https://picsum.photos/seed/news2/600/400', imageHint: 'strong wind', source: 'CNN Indonesia', link: '#' },
+  { id: 'news-3', title: 'Edukasi Mitigasi Bencana Gempa Bumi Sejak Dini', description: 'Pemerintah menggalakkan program edukasi mitigasi bencana gempa bumi di sekolah-sekolah dasar.', content: 'Sebagai negara yang rawan gempa, edukasi mitigasi bencana menjadi sangat penting. Pemerintah melalui Badan Nasional Penanggulangan Bencana (BNPB) meluncurkan program "Sekolah Aman Bencana" yang menyasar siswa sekolah dasar. Program ini mengajarkan langkah-langkah penyelamatan diri seperti "drop, cover, and hold on" melalui metode yang interaktif dan mudah dipahami anak-anak.', category: 'Bencana', date: '2024-08-02', imageUrl: 'https://picsum.photos/seed/news3/600/400', imageHint: 'earthquake drill', source: 'Kompas', link: '#' },
+  { id: 'news-4', title: 'Teknologi AI Bantu Prediksi Cuaca Lebih Akurat', description: 'Penerapan kecerdasan buatan (AI) dalam pemodelan cuaca menunjukkan hasil yang menjanjikan.', content: 'Para peneliti di Institut Teknologi Bandung (ITB) berhasil mengembangkan model prediksi cuaca berbasis AI yang mampu memberikan prakiraan dengan tingkat akurasi lebih tinggi dibandingkan metode konvensional. Model ini menganalisis jutaan data historis cuaca untuk mengenali pola-pola kompleks, sehingga dapat memprediksi perubahan cuaca ekstrem dengan lebih baik.', category: 'Teknologi', date: '2024-08-01', imageUrl: 'https://picsum.photos/seed/news4/600/400', imageHint: 'AI technology', source: 'Detik', link: '#' },
+];
 
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
-    let url = API_URL;
-    if (page) {
-        url += `&page=${page}`;
-    }
+    // This is a mock implementation
+    const pageNum = page ? parseInt(page.split('_')[0], 10) : 1;
+    const pageSize = 10;
+    const totalResults = mockNewsData.length;
+    const totalPages = Math.ceil(totalResults / pageSize);
+    const startIndex = (pageNum - 1) * pageSize;
+    const results = mockNewsData.slice(startIndex, startIndex + pageSize);
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            console.error("News API request failed with status:", response.status);
-            const errorBody = await response.text();
-            console.error("Error body:", errorBody);
-            throw new Error(`Gagal mengambil data berita: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-
-        return {
-            results: data.results.map(mapArticle),
-            nextPage: data.nextPage || null,
-            totalResults: data.totalResults,
-        };
-    } catch (error) {
-        console.error("Error fetching news data:", error);
-        // Fallback to empty state
-        return {
-            results: [],
-            nextPage: null,
-            totalResults: 0,
-        };
-    }
+    const nextPage = pageNum < totalPages ? `${pageNum + 1}_${Date.now()}` : null;
+    
+    return {
+        results,
+        nextPage,
+        totalResults
+    };
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    // API does not support fetching by ID, so we fetch the list and find it.
-    // This is not efficient and should be used with caution.
-    // For this app, we can fetch the general list and find it.
-    try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-            throw new Error('Gagal mengambil data untuk menemukan artikel.');
-        }
-        const data = await response.json();
-        const article = data.results.find((a: any) => a.article_id === id);
-        
-        if (article) {
-            return mapArticle(article);
-        }
-        return undefined;
-
-    } catch (error) {
-        console.error("Error fetching single article:", error);
-        return undefined;
-    }
+    // This is a mock implementation
+    return mockNewsData.find((article) => article.id === id);
 };

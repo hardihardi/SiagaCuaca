@@ -13,7 +13,9 @@ const iconComponents = {
     Zap,
 };
 
-const WeatherIcon = ({ name, className }: { name: keyof typeof iconComponents; className?: string }) => {
+type IconName = keyof typeof iconComponents;
+
+const WeatherIcon = ({ name, className }: { name: IconName; className?: string }) => {
     const IconComponent = iconComponents[name];
     return IconComponent ? <IconComponent className={className} /> : null;
 };

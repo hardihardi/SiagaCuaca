@@ -114,12 +114,14 @@ export default function WeatherPage() {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
+                            fontSize={12}
                         />
                         <YAxis 
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                             unit="°"
+                            fontSize={12}
                         />
                         <ChartTooltip
                             cursor={false}
@@ -145,12 +147,12 @@ export default function WeatherPage() {
           <div className="divide-y divide-border">
             {weatherData.daily.map(day => (
               <div key={day.day} className="flex items-center justify-between py-3 px-2 -mx-2 hover:bg-muted/50 rounded-md transition-colors">
-                <p className="font-medium w-24">{day.day}</p>
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <p className="font-medium w-20 sm:w-24 flex-shrink-0">{day.day}</p>
+                <div className="flex-1 flex items-center gap-2 text-muted-foreground justify-center">
                     <WeatherIcon name={day.icon} className="h-6 w-6" />
-                    <span className="w-24 hidden sm:inline">Cerah Berawan</span>
+                    <span className="w-28 hidden sm:inline">{day.condition}</span>
                 </div>
-                <p className="font-semibold">{day.temp}°C</p>
+                <p className="font-semibold w-16 text-right">{day.temp}°C</p>
               </div>
             ))}
           </div>

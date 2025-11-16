@@ -11,7 +11,7 @@ export interface WeatherData {
   windSpeed: number;
   rainFall: number;
   hourly: { time: string; temp: number; icon: IconName }[];
-  daily: { day: string; temp: number; icon: IconName }[];
+  daily: { day: string; temp: number; icon: IconName, condition: string }[];
 }
 
 export interface EarthquakeData {

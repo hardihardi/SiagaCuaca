@@ -48,15 +48,15 @@ export default async function EarthquakesPage() {
                         </div>
                     </div>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
                             <span className="text-muted-foreground">Magnitudo</span>
                             <span className="text-2xl font-bold">{latestEarthquake.magnitude}</span>
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
                             <span className="text-muted-foreground">Kedalaman</span>
                             <span className="text-2xl font-bold">{latestEarthquake.depth}</span>
                         </div>
-                         <div className="flex items-center justify-between">
+                         <div className="flex items-center justify-between rounded-lg border p-4">
                             <span className="text-muted-foreground">Waktu</span>
                             <span className="font-semibold text-right">{latestEarthquake.time.split(' ')[1]} WIB</span>
                         </div>
@@ -83,7 +83,7 @@ export default async function EarthquakesPage() {
                             <TableBody>
                                 {earthquakeData.map((eq: EarthquakeData) => (
                                     <TableRow key={eq.id}>
-                                        <TableCell className="font-medium">{eq.time}</TableCell>
+                                        <TableCell className="font-medium text-xs sm:text-sm">{eq.time}</TableCell>
                                         <TableCell>
                                             <Badge variant={getMagnitudeBadgeColor(eq.magnitude)}>
                                                 {eq.magnitude}

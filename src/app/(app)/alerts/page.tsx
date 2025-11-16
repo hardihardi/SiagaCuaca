@@ -17,25 +17,25 @@ export default async function AlertsPage() {
       
       {alertsData.length > 0 ? (
         <Card>
-          <CardContent className="p-4 md:p-6">
+          <CardContent className="p-0 md:p-0">
             <Accordion type="single" collapsible className="w-full">
               {alertsData.map((alert: AlertData) => (
                 <AccordionItem value={alert.id} key={alert.id}>
-                  <AccordionTrigger className="hover:no-underline">
+                  <AccordionTrigger className="hover:no-underline p-4 md:p-6">
                     <div className="flex items-start gap-4 text-left">
                         <div className="mt-1">
                             <AlertTriangle className="h-5 w-5 text-accent"/>
                         </div>
                         <div className="flex-1">
                             <h4 className="font-semibold">{alert.title}</h4>
-                            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-4">
+                            <p className="text-sm text-muted-foreground mt-1 flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-1">
                                 <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5"/>{alert.area}</span>
                                 <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5"/>{alert.time}</span>
                             </p>
                         </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pl-12">
+                  <AccordionContent className="pb-4 md:pb-6 px-4 md:px-6 pl-12 md:pl-16">
                     <p className="text-muted-foreground">{alert.details}</p>
                   </AccordionContent>
                 </AccordionItem>

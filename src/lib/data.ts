@@ -19,13 +19,13 @@ export const getWeatherData = async (location: string): Promise<WeatherData> => 
       { time: "18:00", temp: 29, icon: "CloudRain" },
     ],
     daily: [
-        { day: "Senin", temp: 31, icon: "Cloud" },
-        { day: "Selasa", temp: 32, icon: "Sun" },
-        { day: "Rabu", temp: 29, icon: "CloudRain" },
-        { day: "Kamis", temp: 30, icon: "Zap" },
-        { day: "Jumat", temp: 32, icon: "Sun" },
-        { day: "Sabtu", temp: 31, icon: "Cloud" },
-        { day: "Minggu", temp: 30, icon: "CloudRain" },
+        { day: "Senin", temp: 31, icon: "Cloud", condition: "Berawan" },
+        { day: "Selasa", temp: 32, icon: "Sun", condition: "Cerah" },
+        { day: "Rabu", temp: 29, icon: "CloudRain", condition: "Hujan Ringan" },
+        { day: "Kamis", temp: 30, icon: "Zap", condition: "Hujan Petir" },
+        { day: "Jumat", temp: 32, icon: "Sun", condition: "Cerah" },
+        { day: "Sabtu", temp: 31, icon: "Cloud", condition: "Berawan" },
+        { day: "Minggu", temp: 30, icon: "CloudRain", condition: "Hujan Ringan" },
     ]
   };
 };

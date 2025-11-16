@@ -9,6 +9,9 @@ import { Badge } from '@/components/ui/badge';
 
 
 export default function NewsSummary({ initialData }: { initialData: NewsArticle[] }) {
+    if (!initialData || !Array.isArray(initialData)) {
+        return null; 
+    }
     const featuredArticles = initialData.slice(0, 2);
 
     return (

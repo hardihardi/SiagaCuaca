@@ -88,14 +88,14 @@ export default function DashboardPage() {
     const fetchStaticData = async () => {
       try {
         setLoading(prev => ({...prev, static: true}));
-        const [earthquakes, alerts, news] = await Promise.all([
+        const [earthquakes, alerts, newsResponse] = await Promise.all([
           getEarthquakeData(),
           getAlertsData(),
           getNewsData()
         ]);
         setEarthquakeData(earthquakes);
         setAlertsData(alerts);
-        setNewsData(news);
+        setNewsData(newsResponse.results);
       } catch (error) {
         console.error("Failed to fetch static data:", error);
       } finally {

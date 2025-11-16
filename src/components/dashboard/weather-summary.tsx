@@ -37,8 +37,12 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                     <CardDescription>{initialData.location}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 flex flex-col justify-center">
-                    <div className="flex flex-col md:flex-row items-center justify-around text-center my-6 gap-6">
-                        <div className="order-2 md:order-1">
+                    <div className="flex flex-col md:flex-row items-center justify-around my-6 gap-6">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="text-7xl font-bold">{initialData.temperature}°C</div>
+                            <div className="text-muted-foreground text-lg">{localizedDescription}</div>
+                        </div>
+                        <div className="w-full md:w-auto">
                              <div className="grid grid-cols-3 gap-4 text-sm text-center">
                                 <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-muted/50">
                                     <Droplets className="h-5 w-5 text-muted-foreground" />
@@ -56,10 +60,6 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                                     <span className="font-semibold">{initialData.rainFall} mm</span>
                                 </div>
                             </div>
-                        </div>
-                        <div className="order-1 md:order-2">
-                            <div className="text-7xl font-bold">{initialData.temperature}°C</div>
-                            <div className="text-muted-foreground text-lg">{localizedDescription}</div>
                         </div>
                     </div>
                     <div>

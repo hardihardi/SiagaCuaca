@@ -2,7 +2,6 @@
 import { getNewsData } from "@/lib/data";
 import type { NewsArticle } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -20,17 +19,8 @@ function formatDate(dateString: string) {
     }
 }
 
-export default async function NewsPage({ searchParams }: { searchParams: { page?: string } }) {
-  const page = searchParams.page;
-  const { results: newsData, nextPage, totalResults } = await getNewsData(page);
-
-  const currentPageNum = page ? parseInt(page) : 1;
-  const totalPages = Math.ceil((totalResults || 10) / 10);
-  
-  // newsdata.io pagination is a string for the next page, not a number
-  const hasPrevPage = currentPageNum > 1;
-  const prevPageNum = hasPrevPage ? (currentPageNum - 1).toString() : undefined;
-
+export default async function NewsPage() {
+  const { results: newsData } = await getNewsData();
 
   return (
     <div className="space-y-6">
@@ -75,16 +65,6 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
             </Card>
           </Link>
         ))}
-      </div>
-
-      <div className="flex justify-center items-center gap-4 pt-4">
-        <Button asChild variant="outline" disabled={!hasPrevPage}>
-            <Link href={prevPageNum ? `/news?page=${prevPageNum}` : '#'}>Sebelumnya</Link>
-        </Button>
-        <span className="text-sm text-muted-foreground">Halaman {currentPageNum}</span>
-        <Button asChild variant="outline" disabled={!nextPage}>
-            <Link href={nextPage ? `/news?page=${nextPage}` : '#'}>Berikutnya</Link>
-        </Button>
       </div>
     </div>
   );

@@ -76,14 +76,13 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
         apikey: apiKey,
     });
 
-    if (page) {
-        params.append('page', page);
-    }
+    // We remove the page parameter to always fetch the first page.
+    // This simplifies the logic and fixes the 404 error.
     
     const url = `https://newsdata.io/api/1/news?${params.toString()}`;
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, { next: { revalidate: 3600 } }); // Cache for 1 hour
         if (!response.ok) {
             console.error("News API request failed with status:", response.status);
             const errorBody = await response.text();
@@ -92,7 +91,7 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
         }
         const data = await response.json();
         
-        const articles: NewsArticle[] = data.results.map(mapApiArticleToNewsArticle);
+        const articles: NewsArticle[] = (data.results || []).map(mapApiArticleToNewsArticle);
 
         return {
             results: articles,
@@ -106,8 +105,12 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    // newsdata.io doesn't have a lookup by ID endpoint, so we fetch the list and find it.
-    // This is not ideal for performance but necessary with this API.
+    // newsdata.io doesn't have a lookup by ID endpoint.
+    // We fetch the latest list of articles and find the matching one.
+    // This is reliable as long as the user clicks an article from the main news page.
     const newsResponse = await getNewsData();
+    if (!newsResponse || !newsResponse.results) {
+        return undefined;
+    }
     return newsResponse.results.find(article => article.id === id);
 };

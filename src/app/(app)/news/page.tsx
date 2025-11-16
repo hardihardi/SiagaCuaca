@@ -20,9 +20,8 @@ function formatDate(dateString: string) {
     }
 }
 
-export default async function NewsPage({ searchParams }: { searchParams: { page?: string, prevPage?: string } }) {
+export default async function NewsPage({ searchParams }: { searchParams: { page?: string } }) {
   const page = searchParams.page;
-  const prevPage = searchParams.prevPage; // This might be needed for state tracking if API doesn't give prev link
   const { results: newsData, nextPage, totalResults } = await getNewsData(page);
 
   const currentPageNum = page ? parseInt(page) : 1;

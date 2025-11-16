@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth, useUser, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, initiateGoogleSignIn } from '@/firebase';
 import { FirebaseError } from 'firebase/app';
-import { Cloud } from 'lucide-react';
+import { Cloud, Loader2 } from 'lucide-react';
 
 const GoogleIcon = () => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2">
@@ -74,50 +74,22 @@ export default function LoginPage() {
       description: description,
     });
   };
-
-  const handleSignIn = async () => {
-    setLoading(true);
-    try {
-      await initiateEmailSignIn(auth, email, password);
-    } catch (error) {
-      handleAuthError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
   
-  const handleSignUp = async () => {
+  const handleAuthAction = async (action: () => Promise<void>) => {
     setLoading(true);
     try {
-      await initiateEmailSignUp(auth, email, password);
+      await action();
     } catch (error) {
       handleAuthError(error);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleAnonymousSignIn = async () => {
-    setLoading(true);
-    try {
-      await initiateAnonymousSignIn(auth);
-    } catch (error) {
-      handleAuthError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      await initiateGoogleSignIn(auth);
-    } catch (error) {
-        handleAuthError(error)
-    } finally {
-        setLoading(false);
-    }
-  };
+  const handleSignIn = () => handleAuthAction(() => initiateEmailSignIn(auth, email, password));
+  const handleSignUp = () => handleAuthAction(() => initiateEmailSignUp(auth, email, password));
+  const handleAnonymousSignIn = () => handleAuthAction(() => initiateAnonymousSignIn(auth));
+  const handleGoogleSignIn = () => handleAuthAction(() => initiateGoogleSignIn(auth));
   
   if (isUserLoading || user) {
     return (
@@ -131,8 +103,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary">
-      <div className="w-full max-w-md p-4">
+    <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
+      <div className="w-full max-w-md">
         <div className="flex justify-center mb-6">
             <div className="flex items-center gap-2 text-primary">
                 <Cloud className="h-8 w-8" />
@@ -162,7 +134,8 @@ export default function LoginPage() {
               </CardContent>
               <CardFooter className="flex-col gap-4">
                 <Button onClick={handleSignIn} disabled={loading || !email || !password} className="w-full">
-                  {loading ? 'Memproses...' : 'Login'}
+                  {loading && <Loader2 className="animate-spin" />}
+                  Login
                 </Button>
                 <div className="relative w-full">
                     <div className="absolute inset-0 flex items-center">
@@ -175,10 +148,11 @@ export default function LoginPage() {
                     </div>
                 </div>
                  <Button onClick={handleGoogleSignIn} variant="outline" disabled={loading} className="w-full">
-                  {loading ? 'Memproses...' : <><GoogleIcon /> Masuk dengan Google</>}
+                  {loading ? <Loader2 className="animate-spin" /> : <><GoogleIcon /> Masuk dengan Google</>}
                 </Button>
                  <Button onClick={handleAnonymousSignIn} variant="secondary" disabled={loading} className="w-full">
-                  {loading ? 'Memproses...' : 'Lanjutkan sebagai Tamu'}
+                  {loading && <Loader2 className="animate-spin" />}
+                  Lanjutkan sebagai Tamu
                 </Button>
               </CardFooter>
             </Card>
@@ -201,7 +175,8 @@ export default function LoginPage() {
               </CardContent>
               <CardFooter className="flex-col gap-4">
                 <Button onClick={handleSignUp} disabled={loading || !email || !password} className="w-full">
-                  {loading ? 'Memproses...' : 'Daftar'}
+                  {loading && <Loader2 className="animate-spin" />}
+                  Daftar
                 </Button>
                 <div className="relative w-full">
                     <div className="absolute inset-0 flex items-center">
@@ -214,7 +189,7 @@ export default function LoginPage() {
                     </div>
                 </div>
                 <Button onClick={handleGoogleSignIn} variant="outline" disabled={loading} className="w-full">
-                  {loading ? 'Memproses...' : <><GoogleIcon /> Daftar dengan Google</>}
+                  {loading ? <Loader2 className="animate-spin" /> : <><GoogleIcon /> Daftar dengan Google</>}
                 </Button>
               </CardFooter>
             </Card>
@@ -224,5 +199,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

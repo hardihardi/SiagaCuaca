@@ -112,7 +112,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-6">
             <div className="flex items-center gap-2 text-primary">
                 <Cloud className="h-8 w-8" />
-                <span className="text-2xl font-semibold text-foreground">IndoWeatherAlert</span>
+                <span className="text-2xl font-semibold text-foreground">SiagaCuaca</span>
             </div>
         </div>
         <Tabs defaultValue="login" className="w-full">

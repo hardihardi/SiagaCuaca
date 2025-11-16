@@ -88,7 +88,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex h-16 items-center border-b px-6">
             <Link href="/" className="flex items-center gap-2 font-bold text-primary text-lg">
               <Cloud className="h-6 w-6" />
-              <span>IndoWeatherAlert</span>
+              <span>SiagaCuaca</span>
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-4">
@@ -109,7 +109,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex h-16 items-center border-b px-6">
                     <Link href="/" className="flex items-center gap-2 font-bold text-primary text-lg">
                         <Cloud className="h-6 w-6" />
-                        <span>IndoWeatherAlert</span>
+                        <span>SiagaCuaca</span>
                     </Link>
                 </div>
                 <div className="mt-4 flex-1">
@@ -140,9 +140,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>
-                <p className="font-medium">{user?.displayName || user?.email}</p>
+                <p className="font-medium">{user?.displayName || (user?.isAnonymous ? 'Pengguna Tamu' : user?.email)}</p>
                 <p className="text-xs text-muted-foreground font-normal">
-                  {user?.isAnonymous ? "Pengguna Anonim" : user?.displayName ? user?.email : ''}
+                  {user?.isAnonymous ? "Login untuk fitur lengkap" : user?.displayName ? user?.email : ''}
                 </p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

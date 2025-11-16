@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
-  title: 'IndoWeatherAlert',
+  title: 'SiagaCuaca',
   description: 'Aplikasi Prakiraan Cuaca, Gempa Bumi, dan Peringatan Dini Cuaca Indonesia Real-time',
 };
 

@@ -43,6 +43,7 @@ export interface NewsArticle {
   imageHint: string;
   source: string;
   link?: string;
+  summary?: string;
 }
 
 export interface NewsApiResponse {

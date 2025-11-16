@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft, ExternalLink } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { summarizeArticle } from "@/ai/flows/summarize-article-flow";
 
 function formatDate(dateString: string) {
     if (!dateString) return "Tanggal tidak diketahui";
@@ -26,6 +27,9 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
   if (!article) {
     notFound();
   }
+
+  // Generate summary using AI
+  const summary = await summarizeArticle({ articleContent: article.content || article.description || "" });
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -75,7 +79,7 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground whitespace-pre-line">
-                        {article.description || "Deskripsi tidak tersedia."}
+                        {summary.summary}
                     </p>
                 </CardContent>
             </Card>

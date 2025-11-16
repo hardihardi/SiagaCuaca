@@ -3,8 +3,6 @@
 import type { WeatherData } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Droplets, Wind, Umbrella, Sun, Cloud, CloudRain, Zap } from "lucide-react";
-import { localizeWeatherDescriptions } from '@/ai/flows/localize-weather-descriptions';
-import { useState, useEffect } from 'react';
 import React from "react";
 import Link from "next/link";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -25,28 +23,7 @@ const WeatherIcon = ({ name, className }: { name: IconName; className?: string }
 
 
 export default function WeatherSummary({ initialData }: { initialData: WeatherData }) {
-    const [localizedDescription, setLocalizedDescription] = useState(initialData.condition);
-
-    useEffect(() => {
-        const fetchLocalizedDescription = async () => {
-            if (!initialData.location || !initialData.condition) {
-                setLocalizedDescription(initialData.condition);
-                return;
-            }
-            try {
-                const result = await localizeWeatherDescriptions({
-                    location: initialData.location,
-                    weatherDescription: initialData.condition,
-                });
-                setLocalizedDescription(result.localizedDescription);
-            } catch (error) {
-                console.error("Failed to localize weather description, falling back to original:", error);
-                setLocalizedDescription(initialData.condition);
-            }
-        };
-
-        fetchLocalizedDescription();
-    }, [initialData]);
+    const localizedDescription = initialData.condition;
 
   return (
     <Card className="col-span-1 lg:col-span-2 row-span-2">

@@ -15,7 +15,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   
   const [earthquakeNotif, setEarthquakeNotif] = useState(false);
@@ -30,8 +30,10 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      if (!userDocRef) return;
-      setIsLoading(true);
+      if (!userDocRef) {
+        setIsLoading(false);
+        return;
+      }
       try {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
@@ -51,12 +53,10 @@ export default function SettingsPage() {
       }
     };
 
-    if (user) {
+    if (!isUserLoading) {
         fetchSettings();
-    } else if (!user && !isLoading) {
-        setIsLoading(false);
     }
-  }, [user, userDocRef, toast, isLoading]);
+  }, [user, userDocRef, toast, isUserLoading]);
 
 
   const handleSaveChanges = async () => {

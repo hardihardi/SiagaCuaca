@@ -63,6 +63,10 @@ export default function LoginPage() {
             title = "Login Dibatalkan";
             description = "Anda menutup jendela login sebelum proses selesai.";
             break;
+        case 'auth/operation-not-allowed':
+            title = "Metode Login Tidak Aktif";
+            description = "Metode login ini belum diaktifkan. Harap aktifkan di Firebase Console.";
+            break;
         default:
           description = error.message;
       }

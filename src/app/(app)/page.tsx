@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { getWeatherData, getEarthquakeData, getAlertsData } from '@/lib/data';
+import { getWeatherData, getEarthquakeData, getAlertsData, getNewsData } from '@/lib/data';
 import WeatherSummary from '@/components/dashboard/weather-summary';
 import EarthquakeSummary from '@/components/dashboard/earthquake-summary';
 import AlertsSummary from '@/components/dashboard/alerts-summary';
@@ -9,7 +9,7 @@ import NewsSummary from '@/components/dashboard/news-summary';
 import LocationHandler from '@/components/dashboard/location-handler';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WeatherData, EarthquakeData, AlertData } from '@/lib/types';
+import { WeatherData, EarthquakeData, AlertData, NewsArticle } from '@/lib/types';
 
 function WeatherSection({ weatherData }: { weatherData: WeatherData }) {
   return <WeatherSummary initialData={weatherData} />;
@@ -68,23 +68,29 @@ export default function DashboardPage() {
   const [isEarthquakeLoading, setEarthquakeLoading] = useState(true);
   const [alertsData, setAlertsData] = useState<AlertData[] | null>(null);
   const [isAlertsLoading, setAlertsLoading] = useState(true);
+  const [newsData, setNewsData] = useState<NewsArticle[] | null>(null);
+  const [isNewsLoading, setNewsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStaticData() {
         try {
-            const [eqData, alData] = await Promise.all([
+            const [eqData, alData, nData] = await Promise.all([
                 getEarthquakeData(),
-                getAlertsData()
+                getAlertsData(),
+                getNewsData()
             ]);
             setEarthquakeData(eqData);
             setAlertsData(alData);
+            setNewsData(nData.results);
         } catch (error) {
             console.error("Failed to fetch static data:", error);
             setEarthquakeData([]);
             setAlertsData([]);
+            setNewsData([]);
         } finally {
             setEarthquakeLoading(false);
             setAlertsLoading(false);
+            setNewsLoading(false);
         }
     }
     fetchStaticData();
@@ -123,9 +129,11 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid gap-6 md:gap-8">
-        <Suspense fallback={<NewsSkeleton />}>
-            <NewsSummary />
-        </Suspense>
+        {isNewsLoading || !newsData ? (
+            <NewsSkeleton />
+        ) : (
+            <NewsSummary initialData={newsData} />
+        )}
       </div>
     </div>
   );

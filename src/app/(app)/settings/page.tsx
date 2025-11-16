@@ -47,7 +47,6 @@ export default function SettingsPage() {
           // Set initial state for a new user document
           const newUserScaffold = {
             id: user?.uid,
-            clerkId: '', // You might need to populate this if using Clerk
             createdAt: serverTimestamp(), // Will be set on the server
           };
           setUserData(newUserScaffold);
@@ -182,3 +181,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    

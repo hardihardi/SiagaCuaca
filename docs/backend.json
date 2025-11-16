@@ -10,10 +10,6 @@
           "type": "string",
           "description": "Unique identifier for the User entity."
         },
-        "clerkId": {
-          "type": "string",
-          "description": "The Clerk-assigned ID for the user."
-        },
         "createdAt": {
           "type": "string",
           "description": "Timestamp indicating when the user account was created.",
@@ -39,7 +35,6 @@
       },
       "required": [
         "id",
-        "clerkId",
         "createdAt",
         "updatedAt"
       ]

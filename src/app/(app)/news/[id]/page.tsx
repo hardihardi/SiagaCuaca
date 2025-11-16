@@ -59,11 +59,11 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Cuplikan Berita</CardTitle>
+                    <CardTitle>Isi Berita</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground">
-                        {article.description || "Cuplikan tidak tersedia."}
+                    <p className="text-muted-foreground whitespace-pre-line">
+                        {article.content || "Konten tidak tersedia."}
                     </p>
                 </CardContent>
             </Card>

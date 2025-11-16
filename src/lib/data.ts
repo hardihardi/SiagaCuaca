@@ -64,6 +64,7 @@ export const getNewsData = async (): Promise<NewsArticle[]> => {
       id: article.article_id || `${index}`,
       title: article.title,
       description: article.description,
+      content: article.content,
       category: article.category?.[0] || "Berita",
       date: article.pubDate ? format(new Date(article.pubDate), "d MMM yyyy", { locale: id }) : "Tanggal tidak tersedia",
       imageUrl: article.image_url || `https://picsum.photos/seed/news${index}/600/400`,

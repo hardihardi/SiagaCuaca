@@ -35,6 +35,7 @@ export interface NewsArticle {
   id: string;
   title: string;
   description: string | null;
+  content: string | null;
   category: string;
   date: string;
   imageUrl: string;

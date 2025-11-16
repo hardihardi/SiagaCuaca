@@ -10,7 +10,12 @@ import { Calendar, Tag } from "lucide-react";
 
 export default async function NewsPage({ searchParams }: { searchParams: { page?: string, prevPage?:string } }) {
   const page = searchParams.page;
-  const { results: newsData, nextPage } = await getNewsData(page);
+  const prevPage = searchParams.prevPage;
+  const { results: newsData, nextPage, totalResults } = await getNewsData(page);
+
+  // Simple page number calculation (assuming 10 results per page)
+  const currentPageNum = prevPage ? parseInt(prevPage.split('_')[0]) + 1 : 1;
+  const totalPages = Math.ceil((totalResults || 10) / 10);
 
   return (
     <div className="space-y-6">
@@ -58,10 +63,10 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
       </div>
 
       <div className="flex justify-center items-center gap-4 pt-4">
-        <Button asChild variant="outline" disabled={!page}>
-            <Link href={page ? `/news?page=${searchParams.prevPage || ''}` : '#'}>Sebelumnya</Link>
+        <Button asChild variant="outline" disabled={!prevPage}>
+            <Link href={prevPage ? `/news?page=${prevPage}` : '#'}>Sebelumnya</Link>
         </Button>
-        <span className="text-sm text-muted-foreground">Halaman {page ? 'berikutnya' : '1'}</span>
+        <span className="text-sm text-muted-foreground">Halaman {currentPageNum} dari {totalPages}</span>
         <Button asChild variant="outline" disabled={!nextPage}>
             <Link href={nextPage ? `/news?page=${nextPage}&prevPage=${page || ''}` : '#'}>Berikutnya</Link>
         </Button>
@@ -69,3 +74,4 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
     </div>
   );
 }
+

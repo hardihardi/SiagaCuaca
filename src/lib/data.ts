@@ -60,12 +60,12 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
     const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
       console.error("Failed to fetch news:", response.statusText);
-      return { results: [], nextPage: null };
+      return { results: [], nextPage: null, totalResults: 0 };
     }
     const data = await response.json();
     
     const results: NewsArticle[] = data.results.map((article: any, index: number) => ({
-      id: article.article_id || `${index}`,
+      id: article.article_id || `${page || '0'}_${index}`,
       title: article.title,
       description: article.description,
       content: article.content,
@@ -79,12 +79,13 @@ export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
 
     return {
         results,
-        nextPage: data.nextPage || null
+        nextPage: data.nextPage || null,
+        totalResults: data.totalResults || 0,
     };
 
   } catch (error) {
     console.error("Error fetching or parsing news data:", error);
-    return { results: [], nextPage: null };
+    return { results: [], nextPage: null, totalResults: 0 };
   }
 };
 
@@ -93,6 +94,24 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
     // For simplicity in this context, we will fetch all and find,
     // in a real-world scenario with a proper backend, you would fetch a single article by ID.
     // This function might not work correctly with pagination as it only fetches the first page.
-    const { results } = await getNewsData();
-    return results.find(article => article.id === id);
+    let allNews: NewsArticle[] = [];
+    let nextPage: string | null = null;
+    let pageFetched = false;
+
+    // A simple loop to fetch a few pages to find the article. This is not ideal for production.
+    for (let i = 0; i < 5; i++) {
+        const { results, nextPage: newNextPage } = await getNewsData(nextPage || undefined);
+        allNews = allNews.concat(results);
+        const found = allNews.find(article => article.id === id);
+        if (found) {
+            return found;
+        }
+        if (!newNextPage) {
+            break;
+        }
+        nextPage = newNextPage;
+    }
+    
+    // Fallback if not found in first few pages
+    return allNews.find(article => article.id === id);
 }

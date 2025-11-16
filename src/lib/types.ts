@@ -47,4 +47,5 @@ export interface NewsArticle {
 export interface NewsApiResponse {
     results: NewsArticle[];
     nextPage: string | null;
+    totalResults: number;
 }

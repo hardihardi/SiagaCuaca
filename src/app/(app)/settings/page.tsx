@@ -25,9 +25,9 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const userDocRef = useMemoFirebase(() => {
-    if (!user) return null;
+    if (!firestore || !user?.uid) return null;
     return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
+  }, [firestore, user?.uid]);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -48,6 +48,8 @@ export default function SettingsPage() {
           const newUserScaffold = {
             id: user?.uid,
             createdAt: serverTimestamp(), // Will be set on the server
+            earthquakeNotif: false,
+            weatherAlertNotif: true,
           };
           setUserData(newUserScaffold);
         }
@@ -79,6 +81,10 @@ export default function SettingsPage() {
       weatherAlertNotif,
       updatedAt: serverTimestamp()
     };
+     // For new users, ensure createdAt is set
+    if (!settingsData.createdAt) {
+      settingsData.createdAt = serverTimestamp();
+    }
 
     setDoc(userDocRef, settingsData, { merge: true })
       .then(() => {
@@ -181,5 +187,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
-    

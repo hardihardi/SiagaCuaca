@@ -1,19 +1,10 @@
 
 import { Suspense } from 'react';
-import { getWeatherData, getEarthquakeData, getAlertsData, getNewsData } from '@/lib/data';
+import { getWeatherData, getEarthquakeData, getAlertsData } from '@/lib/data';
 import NewsSummary from '@/components/dashboard/news-summary';
 import { NewsSkeleton } from '@/components/dashboard/skeletons';
 import DashboardClient from '@/components/dashboard/dashboard-client';
-
-async function NewsSection() {
-  const newsResponse = await getNewsData();
-  
-  if (!newsResponse || newsResponse.results.length === 0) {
-    return <NewsSkeleton />;
-  }
-
-  return <NewsSummary initialData={newsResponse.results} />;
-}
+import NewsSection from '@/components/dashboard/news-section';
 
 export default async function DashboardPage() {
     const [weatherData, earthquakeData, alertsData] = await Promise.all([

@@ -23,11 +23,25 @@ function formatDate(dateString: string) {
 }
 
 async function SummarySection({ articleContent }: { articleContent: string }) {
+    if (!articleContent) {
+        return (
+             <Card>
+                <CardHeader>
+                    <CardTitle>Ringkasan</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground">
+                        Konten tidak tersedia untuk diringkas.
+                    </p>
+                </CardContent>
+            </Card>
+        );
+    }
     const summary = await summarizeArticle({ articleContent });
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Ringkasan</CardTitle>
+                <CardTitle>Ringkasan AI</CardTitle>
             </CardHeader>
             <CardContent>
                 <p className="text-muted-foreground whitespace-pre-line">
@@ -41,7 +55,7 @@ async function SummarySection({ articleContent }: { articleContent: string }) {
 const SummarySkeleton = () => (
     <Card>
         <CardHeader>
-            <CardTitle>Ringkasan</CardTitle>
+            <CardTitle>Ringkasan AI</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
             <p className="h-4 bg-muted rounded w-full"></p>
@@ -105,6 +119,19 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
             <Suspense fallback={<SummarySkeleton />}>
                 <SummarySection articleContent={articleContent} />
             </Suspense>
+
+            {article.content && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Konten Artikel</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground whitespace-pre-line">
+                            {article.content}
+                        </p>
+                    </CardContent>
+                </Card>
+            )}
 
             {article.link && (
                 <div className="flex justify-end">

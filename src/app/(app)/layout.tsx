@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
 import { AppLayout } from "@/components/app-layout";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Cloud } from 'lucide-react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
@@ -20,11 +21,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-            </div>
+            <Cloud className="h-12 w-12 text-primary animate-pulse" />
+            <p className="text-muted-foreground">Memuat sesi Anda...</p>
         </div>
       </div>
     );

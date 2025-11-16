@@ -127,7 +127,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 <Avatar>
                   <AvatarImage src={user?.photoURL || undefined} alt="User avatar" />
                   <AvatarFallback>
-                    {user?.email ? user.email.charAt(0).toUpperCase() : <UserIcon size={20} />}
+                    {user?.isAnonymous ? <UserIcon size={20} /> : user?.email?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <span className="sr-only">Toggle user menu</span>

@@ -1,7 +1,7 @@
 
 "use client";
 import type { WeatherData } from "@/lib/types";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Droplets, Wind, Umbrella, Sun, Cloud, CloudRain, Zap } from "lucide-react";
 import React from "react";
 import Link from "next/link";
@@ -19,21 +19,21 @@ type IconName = keyof typeof iconComponents;
 
 const WeatherIcon = ({ name, className }: { name: IconName; className?: string }) => {
     const IconComponent = iconComponents[name] || Cloud;
-    return <IconComponent className={cn("text-white/90", className)} />;
+    return <IconComponent className={cn("text-primary-foreground/90", className)} />;
 };
 
 const getWeatherGradient = (condition: IconName) => {
     switch (condition) {
         case "Sun":
-            return "from-blue-400 to-blue-600";
+            return "from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700";
         case "Cloud":
-            return "from-slate-500 to-slate-700";
+            return "from-slate-400 to-slate-600 dark:from-slate-500 dark:to-slate-700";
         case "CloudRain":
-            return "from-gray-600 to-gray-800";
+            return "from-gray-500 to-gray-700 dark:from-gray-600 dark:to-gray-800";
         case "Zap":
-            return "from-indigo-700 to-indigo-900";
+            return "from-indigo-600 to-indigo-800 dark:from-indigo-700 dark:to-indigo-900";
         default:
-            return "from-slate-500 to-slate-700";
+            return "from-slate-400 to-slate-600 dark:from-slate-500 dark:to-slate-700";
     }
 };
 
@@ -42,7 +42,7 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
     const gradient = getWeatherGradient(initialData.conditionIcon);
 
   return (
-    <Card className={cn("col-span-1 lg:col-span-2 row-span-2 text-white overflow-hidden relative shadow-lg", gradient)}>
+    <Card className={cn("col-span-1 lg:col-span-2 row-span-2 text-primary-foreground overflow-hidden relative shadow-lg bg-gradient-to-br", gradient)}>
         <Link href={`/weather?location=${initialData.location.split(',')[0]}`} className="block rounded-lg transition-all h-full group">
             <div className="p-6 h-full flex flex-col justify-between z-10 relative">
                 
@@ -51,11 +51,11 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                     <WeatherIcon name={initialData.conditionIcon} className="h-20 w-20 drop-shadow-lg" />
                     <p className="text-7xl font-bold tracking-tight drop-shadow-md mt-4">{initialData.temperature}°</p>
                     <p className="text-xl font-medium drop-shadow">{localizedDescription}</p>
-                    <p className="text-sm text-white/80 drop-shadow">{initialData.location}</p>
+                    <p className="text-sm text-primary-foreground/80 drop-shadow">{initialData.location}</p>
                 </div>
                 
                 {/* Additional Details */}
-                <div className="flex items-center justify-center gap-6 text-sm mt-6 backdrop-blur-sm bg-white/10 p-3 rounded-xl">
+                <div className="flex items-center justify-center gap-6 text-sm mt-6 backdrop-blur-sm bg-white/10 dark:bg-black/10 p-3 rounded-xl">
                     <div className="flex flex-col items-center gap-1">
                         <Droplets className="h-5 w-5" />
                         <span className="font-semibold">{initialData.humidity}%</span>
@@ -75,8 +75,8 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
                     <ScrollArea className="w-full whitespace-nowrap rounded-md">
                         <div className="flex w-max space-x-3">
                             {initialData.hourly.slice(0, 6).map((hour, index) => (
-                                <div key={index} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/10 backdrop-blur-sm w-16 transition-colors group-hover:bg-white/20">
-                                    <span className="text-xs text-white/80">{hour.time}</span>
+                                <div key={index} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/10 dark:bg-black/10 backdrop-blur-sm w-16 transition-colors group-hover:bg-white/20 dark:group-hover:bg-black/20">
+                                    <span className="text-xs text-primary-foreground/80">{hour.time}</span>
                                     <WeatherIcon name={hour.icon} className="h-6 w-6" />
                                     <span className="font-bold text-base">{hour.temp}°</span>
                                 </div>
@@ -90,3 +90,4 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
     </Card>
   );
 }
+

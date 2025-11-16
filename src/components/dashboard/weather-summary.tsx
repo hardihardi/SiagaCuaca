@@ -27,13 +27,13 @@ const getWeatherGradient = (condition: IconName) => {
         case "Sun":
             return "from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700";
         case "Cloud":
-            return "from-slate-400 to-slate-600 dark:from-slate-500 dark:to-slate-700";
+            return "from-blue-400 to-slate-500 dark:from-slate-500 dark:to-slate-700";
         case "CloudRain":
-            return "from-gray-500 to-gray-700 dark:from-gray-600 dark:to-gray-800";
+            return "from-blue-500 to-gray-600 dark:from-gray-600 dark:to-gray-800";
         case "Zap":
-            return "from-indigo-600 to-indigo-800 dark:from-indigo-700 dark:to-indigo-900";
+            return "from-blue-600 to-indigo-700 dark:from-indigo-700 dark:to-indigo-900";
         default:
-            return "from-slate-400 to-slate-600 dark:from-slate-500 dark:to-slate-700";
+            return "from-blue-400 to-slate-500 dark:from-slate-500 dark:to-slate-700";
     }
 };
 
@@ -90,4 +90,5 @@ export default function WeatherSummary({ initialData }: { initialData: WeatherDa
     </Card>
   );
 }
+
 

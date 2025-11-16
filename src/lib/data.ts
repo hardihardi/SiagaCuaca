@@ -64,7 +64,7 @@ const mapApiArticleToNewsArticle = (article: any): NewsArticle => ({
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
     const apiKey = process.env.NEWSDATA_API_KEY;
     if (!apiKey) {
-        console.error("News API key is not configured in .env file.");
+        console.warn("News API key is not configured. Returning mock data.");
         return { results: [], nextPage: null, totalResults: 0 };
     }
 

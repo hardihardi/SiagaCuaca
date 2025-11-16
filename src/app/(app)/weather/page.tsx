@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getWeatherData } from '@/lib/data';
 import type { WeatherData } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -26,6 +27,8 @@ const WeatherIcon = ({ name, className }: { name: IconName; className?: string }
 
 
 export default function WeatherPage() {
+  const searchParams = useSearchParams();
+  const location = searchParams.get('location') || 'Jakarta';
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +36,7 @@ export default function WeatherPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getWeatherData("Jakarta");
+        const data = await getWeatherData(location);
         setWeatherData(data);
       } catch (error) {
         console.error("Failed to fetch weather data:", error);
@@ -42,7 +45,7 @@ export default function WeatherPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [location]);
 
   const chartData = useMemo(() => {
     return weatherData?.hourly.map(hour => ({

@@ -1,15 +1,31 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import { MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "../ui/card";
 
-export default function LocationHandler() {
+export default function LocationHandler({ onLocationChange }: { onLocationChange: (location: string) => void }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("Jakarta");
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Initial fetch for default location
+    onLocationChange(searchQuery);
+  }, []);
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      onLocationChange(searchQuery);
+      router.push(`/weather?location=${searchQuery}`);
+    }
+  };
 
   const handleGeolocation = () => {
     setLoading(true);
@@ -27,10 +43,14 @@ export default function LocationHandler() {
       (position) => {
         // In a real app, you'd use position.coords.latitude and position.coords.longitude
         // to get the city name via a reverse geocoding API.
-        // For this mock, we'll just show a success toast.
+        // For this mock, we'll just use a default location and show a success toast.
+        const mockLocation = "Bandung";
+        setSearchQuery(mockLocation);
+        onLocationChange(mockLocation);
+        router.push(`/weather?location=${mockLocation}`);
         toast({
           title: "Lokasi ditemukan",
-          description: "Menampilkan cuaca untuk lokasi Anda saat ini.",
+          description: `Menampilkan cuaca untuk ${mockLocation}.`,
         });
         setLoading(false);
       },
@@ -50,9 +70,15 @@ export default function LocationHandler() {
       <div className="p-4 flex flex-col sm:flex-row items-center gap-4">
         <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input placeholder="Cari provinsi/kota..." className="pl-10" />
+          <Input 
+            placeholder="Cari provinsi/kota..." 
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          />
         </div>
-        <Button variant="outline" className="w-full sm:w-auto">
+        <Button variant="outline" className="w-full sm:w-auto" onClick={handleSearch}>
           Cari
         </Button>
         <div className="relative w-full sm:w-auto">

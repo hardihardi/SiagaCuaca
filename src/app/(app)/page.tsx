@@ -1,4 +1,7 @@
-import { Suspense } from 'react';
+
+'use client';
+
+import { Suspense, useState } from 'react';
 import { getWeatherData, getEarthquakeData, getAlertsData, getNewsData } from '@/lib/data';
 import WeatherSummary from '@/components/dashboard/weather-summary';
 import EarthquakeSummary from '@/components/dashboard/earthquake-summary';
@@ -7,50 +10,24 @@ import NewsSummary from '@/components/dashboard/news-summary';
 import LocationHandler from '@/components/dashboard/location-handler';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { WeatherData } from '@/lib/types';
 
-export default function DashboardPage() {
-  return (
-    <div className="space-y-6">
-      <LocationHandler />
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <Suspense fallback={<SummarySkeleton />}>
-          <WeatherSection />
-        </Suspense>
-        <Suspense fallback={<SummarySkeleton />}>
-          <EarthquakeSection />
-        </Suspense>
-        <Suspense fallback={<AlertsSkeleton />}>
-          <AlertsSection />
-        </Suspense>
-      </div>
-      <div className="grid gap-6">
-        <Suspense fallback={<NewsSkeleton />}>
-            <NewsSection />
-        </Suspense>
-      </div>
-    </div>
-  );
-}
-
-async function WeatherSection() {
-  const weatherData = await getWeatherData("Jakarta");
+function WeatherSection({ weatherData }: { weatherData: WeatherData }) {
   return <WeatherSummary initialData={weatherData} />;
 }
 
-async function EarthquakeSection() {
-  const earthquakeData = await getEarthquakeData();
-  return <EarthquakeSummary initialData={earthquakeData} />;
+function EarthquakeSection({ initialData }: { initialData: Awaited<ReturnType<typeof getEarthquakeData>> }) {
+    return <EarthquakeSummary initialData={initialData} />;
 }
 
-async function AlertsSection() {
-  const alertsData = await getAlertsData();
-  return <AlertsSummary initialData={alertsData} />;
+function AlertsSection({ initialData }: { initialData: Awaited<ReturnType<typeof getAlertsData>> }) {
+    return <AlertsSummary initialData={initialData} />;
 }
 
-async function NewsSection() {
-    const newsData = await getNewsData();
-    return <NewsSummary initialData={newsData} />;
+function NewsSection({ initialData }: { initialData: Awaited<ReturnType<typeof getNewsData>> }) {
+    return <NewsSummary initialData={initialData} />;
 }
+
 
 // Skeletons for Suspense fallbacks
 const SummarySkeleton = () => (
@@ -98,3 +75,45 @@ const NewsSkeleton = () => (
         </CardContent>
     </Card>
 )
+
+export default function DashboardPage() {
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [earthquakeData, setEarthquakeData] = useState<Awaited<ReturnType<typeof getEarthquakeData>> | null>(null);
+  const [alertsData, setAlertsData] = useState<Awaited<ReturnType<typeof getAlertsData>> | null>(null);
+  const [newsData, setNewsData] = useState<Awaited<ReturnType<typeof getNewsData>> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const handleLocationChange = async (location: string) => {
+    setLoading(true);
+    try {
+      const [weather, earthquakes, alerts, news] = await Promise.all([
+        getWeatherData(location),
+        getEarthquakeData(),
+        getAlertsData(),
+        getNewsData()
+      ]);
+      setWeatherData(weather);
+      setEarthquakeData(earthquakes);
+      setAlertsData(alerts);
+      setNewsData(news);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <LocationHandler onLocationChange={handleLocationChange} />
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {loading || !weatherData ? <SummarySkeleton /> : <WeatherSection weatherData={weatherData} />}
+        {loading || !earthquakeData ? <SummarySkeleton /> : <EarthquakeSection initialData={earthquakeData} />}
+        {loading || !alertsData ? <AlertsSkeleton /> : <AlertsSection initialData={alertsData} />}
+      </div>
+      <div className="grid gap-6">
+        {loading || !newsData ? <NewsSkeleton /> : <NewsSection initialData={newsData} />}
+      </div>
+    </div>
+  );
+}

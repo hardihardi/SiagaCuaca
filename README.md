@@ -45,7 +45,7 @@ Untuk menjalankan proyek ini di lingkungan lokal Anda, ikuti langkah-langkah ber
 Kloning repositori ini dan instal semua dependensi yang dibutuhkan.
 
 ```bash
-git clone <URL_REPOSITORI_ANDA>
+git clone https://github.com/hardihardi/SiagaCuaca
 cd siaga-cuaca
 npm install
 ```

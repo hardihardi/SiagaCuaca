@@ -1,9 +1,9 @@
 
-import { getNewsData } from "@/lib/data";
+'use client';
+
+import type { NewsArticle } from "@/lib/types";
 import NewsSummary from "@/components/dashboard/news-summary";
 
-export default async function NewsSection() {
-  const newsResponse = await getNewsData();
-  
-  return <NewsSummary initialData={newsResponse.results} />;
+export default function NewsSection({ newsData }: { newsData: NewsArticle[] }) {
+  return <NewsSummary initialData={newsData} />;
 }

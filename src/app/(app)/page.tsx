@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { getWeatherData, getEarthquakeData, getAlertsData } from '@/lib/data';
+import { getWeatherData, getEarthquakeData, getAlertsData, getNewsData } from '@/lib/data';
 import WeatherSummary from '@/components/dashboard/weather-summary';
 import EarthquakeSummary from '@/components/dashboard/earthquake-summary';
 import AlertsSummary from '@/components/dashboard/alerts-summary';
@@ -68,23 +68,29 @@ export default function DashboardPage() {
   const [isEarthquakeLoading, setEarthquakeLoading] = useState(true);
   const [alertsData, setAlertsData] = useState<AlertData[] | null>(null);
   const [isAlertsLoading, setAlertsLoading] = useState(true);
+  const [newsData, setNewsData] = useState<NewsArticle[] | null>(null);
+  const [isNewsLoading, setNewsLoading] = useState(true);
   
   useEffect(() => {
     async function fetchStaticData() {
         try {
-            const [eqData, alData] = await Promise.all([
+            const [eqData, alData, newsResponse] = await Promise.all([
                 getEarthquakeData(),
                 getAlertsData(),
+                getNewsData(),
             ]);
             setEarthquakeData(eqData);
             setAlertsData(alData);
+            setNewsData(newsResponse.results);
         } catch (error) {
             console.error("Failed to fetch static data:", error);
             setEarthquakeData([]);
             setAlertsData([]);
+            setNewsData([]);
         } finally {
             setEarthquakeLoading(false);
             setAlertsLoading(false);
+            setNewsLoading(false);
         }
     }
     fetchStaticData();
@@ -123,9 +129,11 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid gap-6 md:gap-8">
-        <Suspense fallback={<NewsSkeleton />}>
-            <NewsSection />
-        </Suspense>
+        {isNewsLoading || !newsData ? (
+            <NewsSkeleton />
+        ) : (
+            <NewsSection newsData={newsData} />
+        )}
       </div>
     </div>
   );

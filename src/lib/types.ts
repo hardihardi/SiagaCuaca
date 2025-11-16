@@ -43,3 +43,8 @@ export interface NewsArticle {
   source: string;
   link?: string;
 }
+
+export interface NewsApiResponse {
+    results: NewsArticle[];
+    nextPage: string | null;
+}

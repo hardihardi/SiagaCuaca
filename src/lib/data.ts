@@ -1,4 +1,4 @@
-import type { NewsArticle } from '@/lib/types';
+import type { NewsArticle, NewsApiResponse } from '@/lib/types';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -48,19 +48,23 @@ export const getAlertsData = async () => {
     ]
 }
 
-// Fetches real news data from newsdata.io API
-export const getNewsData = async (): Promise<NewsArticle[]> => {
+// Fetches real news data from newsdata.io API with pagination
+export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
   const apiKey = 'pub_066ffdf224864fe188a72234ee07c9bf';
-  const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=BMKG&language=id`;
+  let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=BMKG&language=id`;
+  if (page) {
+    url += `&page=${page}`;
+  }
+
   try {
     const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
-        console.error("Failed to fetch news:", response.statusText);
-        return [];
+      console.error("Failed to fetch news:", response.statusText);
+      return { results: [], nextPage: null };
     }
     const data = await response.json();
     
-    return data.results.map((article: any, index: number) => ({
+    const results: NewsArticle[] = data.results.map((article: any, index: number) => ({
       id: article.article_id || `${index}`,
       title: article.title,
       description: article.description,
@@ -72,9 +76,15 @@ export const getNewsData = async (): Promise<NewsArticle[]> => {
       source: article.source_id || "Sumber tidak diketahui",
       link: article.link,
     }));
+
+    return {
+        results,
+        nextPage: data.nextPage || null
+    };
+
   } catch (error) {
     console.error("Error fetching or parsing news data:", error);
-    return [];
+    return { results: [], nextPage: null };
   }
 };
 
@@ -82,6 +92,7 @@ export const getNewsArticleById = async (id: string): Promise<NewsArticle | unde
     // This function will now find the article from the fetched data.
     // For simplicity in this context, we will fetch all and find,
     // in a real-world scenario with a proper backend, you would fetch a single article by ID.
-    const articles = await getNewsData();
-    return articles.find(article => article.id === id);
+    // This function might not work correctly with pagination as it only fetches the first page.
+    const { results } = await getNewsData();
+    return results.find(article => article.id === id);
 }

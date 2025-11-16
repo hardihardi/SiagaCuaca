@@ -8,8 +8,9 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Tag } from "lucide-react";
 
-export default async function NewsPage() {
-  const newsData = await getNewsData();
+export default async function NewsPage({ searchParams }: { searchParams: { page?: string, prevPage?:string } }) {
+  const page = searchParams.page;
+  const { results: newsData, nextPage } = await getNewsData(page);
 
   return (
     <div className="space-y-6">
@@ -57,9 +58,13 @@ export default async function NewsPage() {
       </div>
 
       <div className="flex justify-center items-center gap-4 pt-4">
-        <Button variant="outline" disabled>Sebelumnya</Button>
-        <span className="text-sm text-muted-foreground">Halaman 1 dari 1</span>
-        <Button variant="outline" disabled>Berikutnya</Button>
+        <Button asChild variant="outline" disabled={!page}>
+            <Link href={page ? `/news?page=${searchParams.prevPage || ''}` : '#'}>Sebelumnya</Link>
+        </Button>
+        <span className="text-sm text-muted-foreground">Halaman {page ? 'berikutnya' : '1'}</span>
+        <Button asChild variant="outline" disabled={!nextPage}>
+            <Link href={nextPage ? `/news?page=${nextPage}&prevPage=${page || ''}` : '#'}>Berikutnya</Link>
+        </Button>
       </div>
     </div>
   );

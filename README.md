@@ -1,6 +1,6 @@
 # SiagaCuaca: Aplikasi Cuaca & Kebencanaan Indonesia
 
-**SiagaCuaca** adalah aplikasi web modern dan real-time yang menyediakan informasi lengkap seputar prakiraan cuaca, data gempa bumi terkini, peringatan dini, dan berita kebencanaan di seluruh wilayah Indonesia. Dibangun dengan teknologi terkini, aplikasi ini dirancang untuk menjadi sumber informasi yang cepat, andal, dan mudah diakses.
+**SiagaCuaca** adalah aplikasi web modern dan real-time yang menyediakan informasi lengkap seputar prakiraan cuaca, data gempa bumi terkini, peringatan dini, dan berita kebencanaan di seluruh wilayah Indonesia. Dibangun installcuacacuaca teknologi terkini, aplikasi ini dirancang untuk menjadi sumber informasi yang cepat, andal, dan mudah diakses.
 
 ## ✨ Fitur Utama
 
@@ -46,7 +46,7 @@ Kloning repositori ini dan instal semua dependensi yang dibutuhkan.
 
 ```bash
 git clone https://github.com/hardihardi/SiagaCuaca
-cd siaga-cuaca
+cd siagacuaca
 npm install
 ```
 

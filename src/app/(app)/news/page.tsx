@@ -74,4 +74,3 @@ export default async function NewsPage({ searchParams }: { searchParams: { page?
     </div>
   );
 }
-

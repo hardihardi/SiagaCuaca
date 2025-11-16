@@ -50,47 +50,75 @@ export const getAlertsData = async () => {
     ]
 }
 
-const mockNewsData: NewsArticle[] = [
-    {
-      id: 'news-1',
-      title: 'BMKG: Waspada Potensi Hujan Lebat di Sebagian Besar Wilayah Indonesia',
-      description: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) mengeluarkan peringatan dini mengenai potensi hujan lebat yang dapat disertai kilat/petir dan angin kencang di sebagian besar wilayah Indonesia dalam beberapa hari ke depan.',
-      content: 'Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) meminta masyarakat untuk waspada terhadap potensi hujan dengan intensitas sedang hingga lebat yang dapat disertai kilat/petir dan angin kencang di sejumlah provinsi di Indonesia. Prakiraan ini berlaku untuk periode 6-8 Agustus 2024. Beberapa wilayah yang berpotensi mengalami cuaca signifikan antara lain Sumatera Barat, Riau, Jambi, Bengkulu, Sumatera Selatan, Lampung, sebagian besar Jawa, Kalimantan, Sulawesi, dan Papua. Kepala Pusat Meteorologi Publik BMKG, Andri Ramdhani, mengatakan bahwa kondisi ini dipicu oleh aktivitas gelombang atmosfer dan sirkulasi siklonik di sekitar wilayah Indonesia. "Kami mengimbau masyarakat untuk tetap waspada dan berhati-hati terhadap potensi dampak bencana hidrometeorologi seperti banjir, tanah longsor, dan pohon tumbang," ujarnya.',
-      category: 'Cuaca',
-      date: '5 Agu 2024',
-      imageUrl: 'https://picsum.photos/seed/news1/600/400',
-      imageHint: 'rainy weather',
-      source: 'BMKG',
-      link: 'https://www.bmkg.go.id'
-    },
-    {
-      id: 'news-2',
-      title: 'Gempa Magnitudo 5.2 Guncang Sukabumi, Tidak Berpotensi Tsunami',
-      description: 'Gempa bumi dengan magnitudo 5.2 mengguncang wilayah Sukabumi, Jawa Barat pada Senin (5/8) siang. BMKG menyatakan gempa ini tidak berpotensi tsunami.',
-      content: 'Gempa bumi tektonik mengguncang wilayah pesisir selatan Jawa Barat pada hari Senin, 5 Agustus 2024, pukul 14:35:10 WIB. Hasil analisis BMKG menunjukkan bahwa gempa ini memiliki parameter update dengan magnitudo M5.0. Episenter gempa terletak pada koordinat 7.99° LS dan 106.51° BT, atau tepatnya berlokasi di laut pada jarak 125 km arah Barat Daya dari Kabupaten Sukabumi, Jawa Barat pada kedalaman 10 km. Berdasarkan pemodelan, gempa ini tidak berpotensi menimbulkan tsunami. Guncangan dirasakan di beberapa daerah seperti Palabuhanratu, Cianjur, hingga sebagian wilayah Jakarta dengan intensitas yang berbeda. Warga diimbau untuk tetap tenang dan tidak terpengaruh oleh isu yang tidak dapat dipertanggungjawabkan kebenarannya.',
-      category: 'Gempa Bumi',
-      date: '5 Agu 2024',
-      imageUrl: 'https://picsum.photos/seed/news2/600/400',
-      imageHint: 'earthquake map',
-      source: 'Kompas',
-      link: '#'
-    },
-];
 
-// Reverted to mock data due to API key failure.
+const API_KEY = process.env.NEWSDATA_API_KEY;
+const API_URL = `https://newsdata.io/api/1/latest?country=id&language=id&apikey=${API_KEY}`;
+
+const mapArticle = (article: any): NewsArticle => ({
+    id: article.article_id,
+    title: article.title,
+    description: article.description,
+    content: article.content,
+    category: article.category?.[0] || 'Umum',
+    date: article.pubDate ? format(new Date(article.pubDate), 'd LLL yyyy', { locale: id }) : 'Tanggal tidak diketahui',
+    imageUrl: article.image_url || `https://picsum.photos/seed/${article.article_id}/600/400`,
+    imageHint: 'abstract',
+    source: article.source_id || 'Tidak diketahui',
+    link: article.link,
+});
+
 export const getNewsData = async (page?: string): Promise<NewsApiResponse> => {
-    console.log("Menggunakan data berita mock karena kegagalan API.");
-    // This mock implementation does not support pagination.
-    // It returns the same data regardless of the page parameter.
-    return Promise.resolve({
-        results: mockNewsData,
-        nextPage: null, // No next page for mock data
-        totalResults: mockNewsData.length,
-    });
+    let url = API_URL;
+    if (page) {
+        url += `&page=${page}`;
+    }
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error("News API request failed with status:", response.status);
+            const errorBody = await response.text();
+            console.error("Error body:", errorBody);
+            throw new Error(`Gagal mengambil data berita: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+
+        return {
+            results: data.results.map(mapArticle),
+            nextPage: data.nextPage || null,
+            totalResults: data.totalResults,
+        };
+    } catch (error) {
+        console.error("Error fetching news data:", error);
+        // Fallback to empty state
+        return {
+            results: [],
+            nextPage: null,
+            totalResults: 0,
+        };
+    }
 };
 
 export const getNewsArticleById = async (id: string): Promise<NewsArticle | undefined> => {
-    // Finds the article from the mock data array.
-    const allNews = mockNewsData;
-    return allNews.find(article => article.id === id);
-}
+    // API does not support fetching by ID, so we fetch the list and find it.
+    // This is not efficient and should be used with caution.
+    // For this app, we can fetch the general list and find it.
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+            throw new Error('Gagal mengambil data untuk menemukan artikel.');
+        }
+        const data = await response.json();
+        const article = data.results.find((a: any) => a.article_id === id);
+        
+        if (article) {
+            return mapArticle(article);
+        }
+        return undefined;
+
+    } catch (error) {
+        console.error("Error fetching single article:", error);
+        return undefined;
+    }
+};
